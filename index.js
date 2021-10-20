@@ -8,12 +8,52 @@ import path from 'path';
 
 
 const INPUT_FILE = path.join('data', 'input.txt');
+const fieldsToKeepFromPipeline = ['id', 'name', 'condition', 'statements'];
+const fieldsToKeepFromStatements = ['id', 'feature', 'definition', 'condition', 'detailed'];
+const scriptTranslators = [
+  { from: /not \( (\$\w+) ?\[(\w+)\] isPopulated \)/gm, to: `($1['$2']==undefined)` },
+  { from: /(\$\w+) ?\[(\w+)\] isPopulated/gm, to: `($1['$2']!=undefined)` },
+  { from: /not \( (\$\w+) ?\[(\w+)\] isEmpty \)/gm, to: `($1['$2']!="")` },
+  { from: /(\$\w+) ?\[(\w+)\] isEmpty/gm, to: `($1['$2']=="" || $1['$2']==undefined)` },
+  { from: /(\$\w+) ?\[(\w+)\] is not "(.*?)"/gm, to: `($1['$2']!=="$3")` },
+  { from: /(\$\w+) ?\[(\w+)\] is "(.*?)"/gm, to: `($1['$2']=="$3")` },
+  { from: /(\$\w+) ?\[(\w+)\] matches "(.*?)"/gm, to: `($1['$2']=="$3")` },
+  { from: /(\$\w+) ?\[(\w+)\] doesn't match "(.*?)"/gm, to: `($1['$2']!="$3")` },
+  { from: /(\$\w+) ?\[(\w+)\] contains "(.*?)"?/gm, to: `($1['$2'].indexOf("$3")!=-1)` },
+  { from: /(\$\w+) ?\[(\w+)\] doesn't contain "(.*?)"/gm, to: `($1['$2'].indexOf("$3")==-1)` },
+  { from: /(\$\w+) ?\[(\w+)\] is not (.*?) /gm, to: `($1['$2']!=="$3")` },
+  { from: /(\$\w+) ?\[(\w+)\] is (.*?) /gm, to: `($1['$2']=="$3")` },
+  { from: /(\$\w+) ?\[(\w+)\] matches (.*?) /gm, to: `($1['$2']=="$3")` },
+  { from: /(\$\w+) ?\[(\w+)\] doesn't match (.*?) /gm, to: `($1['$2']!="$3")` },
+  { from: /(\$\w+) ?\[(\w+)\] contains (.*?) /gm, to: `($1['$2'].indexOf("$3")!=-1)` },
+  { from: /(\$\w+) ?\[(\w+)\] doesn't contain (.*?) /gm, to: `($1['$2'].indexOf("$3")==-1)` },
+  { from: /not \( (\$\w+) isEmpty \)/gm, to: `($1!="")` },
+  { from: /(\$\w+) is not "(.*?)"/gm, to: `($1!=="$2")` },
+  { from: /(\$\w+) is "(.*?)"/gm, to: `($1=="$2")` },
+  { from: /(\$\w+) matches "(.*?)"/gm, to: `($1=="$2")` },
+  { from: /(\$\w+) doesn't match "(.*?)"/gm, to: `($1!="$2")` },
+  { from: /(\$\w+) isEmpty/gm, to: `($1=="" || $1==undefined)` },
+  { from: /(\$\w+) contains "(.*?)"/gm, to: `($1.indexOf("$2")!=-1)` },
+  { from: /(\$\w+) doesn't contain "(.*?)"/gm, to: `($1.indexOf("$2")==-1)` },
+
+  { from: /(\$\w+) is not (.*?) /gm, to: `($1!=="$2")` },
+  { from: /(\$\w+) is (.*?) /gm, to: `($1=="$2")` },
+  { from: /(\$\w+) matches (.*?) /gm, to: `($1=="$2")` },
+  { from: /(\$\w+) doesn't match (.*?) /gm, to: `($1!="$2")` },
+  { from: /(\$\w+) contains (.*?) /gm, to: `($1.indexOf("$2")!=-1)` },
+  { from: /(\$\w+) doesn't contain (.*?) /gm, to: `($1.indexOf("$2")==-1)` },
+
+  { from: /not \( (\$\w+) isPopulated \)/gm, to: `($1==undefined)` },
+  { from: /(\$\w+) isPopulated/gm, to: `($1!=undefined)` },
+  { from: / and /gm, to: ` && ` },
+  { from: / or /gm, to: ` || ` }
+];
+const addFull = false;
 
 
 const parseCurl = (curlCmd) => {
   const jsonString = curlconverter.toJsonString(curlCmd);
   const json = JSON.parse(jsonString);
-
   // data is a map of the POST body, as a key.
   // for example: 
   // "data": {
@@ -22,6 +62,7 @@ const parseCurl = (curlCmd) => {
 
   try {
     const data = Object.keys(json.data)[0];
+    console.log(data);
     json.data = JSON.parse(data);
   }
   catch (e) {
@@ -34,6 +75,131 @@ const parseCurl = (curlCmd) => {
 
 const writeJson = (data, fileName) => {
   fs.writeFileSync(path.join('data', fileName), JSON.stringify(data, null, 2));
+};
+
+const cleanDefinition = (definition) => {
+  //\"(.*)\", --> replace to (.*)
+  //\"(.*)\" --> replace to (.*)
+  //let regex1 = /\\"(.*)\\",/gm;
+  //let regex2 = /\\"(.*)\\"/gm;
+  let regex1 = /"(\w+)"/gm;
+  let regex2 = /"\\"(.*)\\""/gm;
+  //console.log('Before clean: ' + definition);
+  let clean = definition.replace(regex1, "$1").replace(regex2, '"$1"');
+  //console.log('After clean: ' + clean);
+  return clean;
+};
+
+const cleanScript = (condition) => {
+  condition = condition + ' ';
+  scriptTranslators.map(script => {
+    condition = condition.replace(script.from, script.to);
+  });
+  console.log(condition);
+  return condition;
+};
+
+const cleanCondition = (condition) => {
+  let clean = {};
+  if (condition == undefined) return null;
+  Object.keys(condition).map(key => {
+    if (fieldsToKeepFromStatements.includes(key)) {
+      clean[key] = condition[key];
+    }
+  });
+  clean['definition'] = cleanDefinition(clean['definition']);
+  //Check if it is a when operation (a condition)
+  if (clean['feature'] == 'when') {
+    clean['clean_definition'] = cleanScript(clean['definition'].replace('when ', ''));
+  }
+  return clean;
+};
+const cleanFieldsPipeline = (pipeline) => {
+  let clean = {};
+  Object.keys(pipeline).map(key => {
+    if (fieldsToKeepFromPipeline.includes(key)) {
+      clean[key] = pipeline[key];
+    }
+  });
+  //Check if condition is defined, if so clean it
+  clean['condition'] = cleanCondition(clean['condition']);
+  return clean;
+};
+const cleanFieldsStatement = (statements) => {
+  let clean = {};
+  let cleanStatements = [];
+  statements.map(statement => {
+    Object.keys(statement).map(key => {
+      if (fieldsToKeepFromStatements.includes(key)) {
+        clean[key] = statement[key];
+      }
+    });
+    clean['definition'] = cleanDefinition(clean['definition']);
+    //Check if condition is defined, if so clean it
+    clean['condition'] = cleanCondition(clean['condition']);
+
+    cleanStatements.push(clean);
+  });
+  return cleanStatements;
+};
+
+const getStatements = async (pipeline) => {
+  console.log(`Getting Statements for: ${pipeline.id}`);
+  return new Promise((resolve, reject) => {
+    platformClient.pipeline.statements.list(pipeline.id, { perPage: 1000 }).then(
+      responseStatement => {
+        console.log(`Got Statements for: ${pipeline.id}`);
+        let allstatements = {};
+        allstatements.fullstatements = responseStatement.statements;
+        allstatements.statements = cleanFieldsStatement(responseStatement.statements);
+        resolve(allstatements);
+      }
+    );
+  });
+};
+
+function sleeper(ms) {
+  return function (x) {
+    return new Promise(resolve => setTimeout(() => resolve(x), ms));
+  };
+}
+
+function executeSequentially(tasks) {
+  return tasks.reduce(function (sequence, curPromise) {
+    // Use reduce to chain the promises together
+    return sequence.then(sleeper(50)).then(function () {
+      return curPromise;
+    });
+  }, Promise.resolve());
+}
+
+
+const getQPL = async () => {
+  let allContent = [];
+  let allTasks = [];
+  return new Promise((resolve, reject) => {
+    platformClient.pipeline.list({ perPage: 1000 }).then(
+      async (response) => {
+        console.log(response);
+        response.map(async (pipeline) => {
+          let pipedata = cleanFieldsPipeline(pipeline);
+          let task = getStatements(pipeline).then(result => {
+            pipedata['statements'] = result.statements;
+            if (addFull) pipedata['fullstatements'] = result.fullstatements;
+            allContent.push(pipedata);
+            console.log("Got Statements");
+          });
+          allTasks.push(task);
+        });
+        console.log("Got ALL Statements");
+        executeSequentially(allTasks).then(() => {
+          console.log(allContent);
+          resolve(allContent);
+        });
+      },
+      errorHandler
+    );
+  });
 };
 
 const createPlatformClient = (request) => {
@@ -60,7 +226,8 @@ const createPlatformClient = (request) => {
   catch (e) {
     console.warn('did not find a valid "data/api.key"');
   }
-
+  console.log(request.queries?.organizationId);
+  console.log(apiKeyOrToken);
   return new PlatformClient({
     accessToken: apiKeyOrToken || 'Missing-Token',
     organizationId: request.queries?.organizationId,
@@ -97,9 +264,15 @@ console.log('Request parsed.');
 const platformClient = createPlatformClient(request);
 
 console.log('Pipelines (list) for org: \x1b[33m%s\x1b[0m', request.queries?.organizationId);
-const pipelines = await platformClient.pipeline.list({ perPage: 1000 }).catch(errorHandler.bind(null, 'Pipelines (list) - Error - Check the token in data/api.key. Expired? \n'));
+const pipelines = await platformClient.pipeline.list({ perPage: 1000 }).catch(errorHandler.bind(null, 'Pipelines (list) - \x1b[31m Error - Check the token in data/api.key. \x1b[0m Expired? \n'));
 console.log(`Pipelines (list) - Got ${pipelines.length} pipelines.`);
-writeJson(pipelines, 'pipelines.json');
+
+console.log('Getting QPLs');
+await getQPL().then(content => {
+  console.log(content);
+  writeJson(content, 'pipelines.json');
+});
+
 
 // Run the cURL request with Debug
 console.log('Run the request with Debug');
