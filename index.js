@@ -79,9 +79,6 @@ const sendRequest = async (request) => {
   return data;
 };
 
-const errorHandler = (message, err) => {
-  console.warn(message, err);
-};
 
 //
 // main

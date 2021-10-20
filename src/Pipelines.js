@@ -1,7 +1,8 @@
 
-const fieldsToKeepFromPipeline = ['id', 'name', 'condition', 'statements'];
-const fieldsToKeepFromStatements = ['id', 'feature', 'definition', 'condition', 'detailed'];
-const scriptTranslators = [
+const FIELDS_FROM_PIPELINE = ['id', 'name', 'condition', 'statements'];
+const FIELDS_FROM_STATEMENTS = ['id', 'feature', 'definition', 'condition', 'detailed'];
+
+const SCRIPT_TRANSLATORS = [
   { from: /not \( (\$\w+) ?\[(\w+)\] isPopulated \)/gm, to: `($1['$2']==undefined)` },
   { from: /(\$\w+) ?\[(\w+)\] isPopulated/gm, to: `($1['$2']!=undefined)` },
   { from: /not \( (\$\w+) ?\[(\w+)\] isEmpty \)/gm, to: `($1['$2']!="")` },
@@ -42,19 +43,8 @@ const scriptTranslators = [
 const addFull = false;
 
 
-function sleeper(ms) {
-  return function (x) {
-    return new Promise(resolve => setTimeout(() => resolve(x), ms));
-  };
-}
-
-function executeSequentially(tasks) {
-  return tasks.reduce(function (sequence, curPromise) {
-    // Use reduce to chain the promises together
-    return sequence.then(sleeper(50)).then(function () {
-      return curPromise;
-    });
-  }, Promise.resolve());
+async function sleeper(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 const errorHandler = (message, err) => {
@@ -82,7 +72,7 @@ class Pipelines {
 
   cleanScript(condition) {
     condition = condition + ' ';
-    scriptTranslators.map(script => {
+    SCRIPT_TRANSLATORS.map(script => {
       condition = condition.replace(script.from, script.to);
     });
     console.log(condition);
@@ -91,9 +81,9 @@ class Pipelines {
 
   cleanCondition(condition) {
     let clean = {};
-    if (condition == undefined) return null;
+    if (!condition) { return null; }
     Object.keys(condition).map(key => {
-      if (fieldsToKeepFromStatements.includes(key)) {
+      if (FIELDS_FROM_STATEMENTS.includes(key)) {
         clean[key] = condition[key];
       }
     });
@@ -108,10 +98,11 @@ class Pipelines {
   cleanFieldsPipeline(pipeline) {
     let clean = {};
     Object.keys(pipeline).map(key => {
-      if (fieldsToKeepFromPipeline.includes(key)) {
+      if (FIELDS_FROM_PIPELINE.includes(key)) {
         clean[key] = pipeline[key];
       }
     });
+
     //Check if condition is defined, if so clean it
     clean['condition'] = this.cleanCondition(clean['condition']);
     return clean;
@@ -122,7 +113,7 @@ class Pipelines {
     let cleanStatements = [];
     statements.map(statement => {
       Object.keys(statement).map(key => {
-        if (fieldsToKeepFromStatements.includes(key)) {
+        if (FIELDS_FROM_STATEMENTS.includes(key)) {
           clean[key] = statement[key];
         }
       });
@@ -137,45 +128,40 @@ class Pipelines {
 
   async getQPL() {
     let allContent = [];
-    let allTasks = [];
-    return new Promise((resolve, reject) => {
-      this.platformClient.pipeline.list({ perPage: 1000 }).then(
-        async (response) => {
-          console.log(response);
-          response.map(async (pipeline) => {
-            let pipedata = this.cleanFieldsPipeline(pipeline);
-            let task = this.getStatements(pipeline).then(result => {
-              pipedata['statements'] = result.statements;
-              if (addFull) pipedata['fullstatements'] = result.fullstatements;
-              allContent.push(pipedata);
-              console.log("Got Statements");
-            });
-            allTasks.push(task);
-          });
-          console.log("Got ALL Statements");
-          executeSequentially(allTasks).then(() => {
-            console.log(allContent);
-            resolve(allContent);
-          });
-        },
-        errorHandler.bind(null, 'Pipelines::getQPL - \x1b[31m Error - Check the token in data/api.key. \x1b[0m Expired? \n')
-      );
-    });
+
+    const response = await this.platformClient.pipeline.list({ perPage: 1000 }).catch(errorHandler.bind(null, 'Pipelines::getQPL - \x1b[31m Error - Check the token in data/api.key. \x1b[0m Expired? \n'));
+    // console.log(response);
+
+    // use for loop instead of response.forEach or response.map to ensure it's sequential.
+    for (let i = 0; i < response.length; i++) {
+      const pipeline = response[i];
+      let pipedata = this.cleanFieldsPipeline(pipeline);
+      let result = await this.getStatements(pipeline);
+
+      pipedata['statements'] = result.statements;
+      if (addFull) {
+        pipedata['fullstatements'] = result.fullstatements;
+      }
+      allContent.push(pipedata);
+      console.log("");
+      await sleeper(100);
+    }
+    console.log("Got ALL Statements");
+
+    return allContent;
   }
 
   async getStatements(pipeline) {
     console.log(`Getting Statements for: ${pipeline.id}`);
-    return new Promise((resolve, reject) => {
-      this.platformClient.pipeline.statements.list(pipeline.id, { perPage: 1000 }).then(
-        responseStatement => {
-          console.log(`Got Statements for: ${pipeline.id}`);
-          let allstatements = {};
-          allstatements.fullstatements = responseStatement.statements;
-          allstatements.statements = this.cleanFieldsStatement(responseStatement.statements);
-          resolve(allstatements);
-        }
-      );
-    });
+    const responseStatement = await this.platformClient.pipeline.statements.list(pipeline.id, { perPage: 1000 });
+    console.log(`Got Statements for: ${pipeline.id}`);
+
+    let allstatements = {
+      fullstatements: responseStatement.statements,
+      statements: this.cleanFieldsStatement(responseStatement.statements),
+    };
+
+    return allstatements;
   }
 
 }
