@@ -18,4 +18,10 @@ Copy it in `input.txt`, then execute:
 node index.js
 ```
 
-The file `output.json` will have the request's data parsed properly in a nice JSON.
+The file `request.json` will have the request's data parsed properly in a nice JSON.
+
+## Getting Pipelines
+
+To get pipelines, you need an Admin token. Set your token in `data/api.key` before running `node index.js`.
+
+The pipeline info will be in `data/pipelines.json`

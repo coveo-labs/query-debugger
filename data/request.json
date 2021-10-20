@@ -1,11 +1,11 @@
 {
   "url": "https://platform.cloud.coveo.com/rest/search/v2",
-  "raw_url": "https://platform.cloud.coveo.com/rest/search/v2?organizationId=fashioncoveodemocomgzh7iep8",
+  "raw_url": "https://platform.cloud.coveo.com/rest/search/v2?organizationId=coveodemoorg123",
   "method": "post",
   "headers": {
     "authority": "platform.cloud.coveo.com",
     "sec-ch-ua": "\"Chromium\";v=\"94\", \"Google Chrome\";v=\"94\", \";Not A Brand\";v=\"99\"",
-    "authorization": "Bearer xx149e3ec9-786f-4c6c-b64f-49a403b930de",
+    "authorization": "Bearer ABC-123-token-or-Api-key",
     "dnt": "1",
     "content-type": "application/json",
     "sec-ch-ua-mobile": "?0",
@@ -20,7 +20,7 @@
     "accept-language": "en-US,en;q=0.9,fr;q=0.8,ja;q=0.7"
   },
   "queries": {
-    "organizationId": "fashioncoveodemocomgzh7iep8"
+    "organizationId": "coveodemoorg123"
   },
   "data": {
     "locale": "en-US",

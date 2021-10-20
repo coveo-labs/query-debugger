@@ -1,9 +1,13 @@
-const curlconverter = require('curlconverter');
+import curlconverter from 'curlconverter';
+import { PlatformClient, Environment, Region } from '@coveord/platform-client';
 
-const fs = require('fs');
-const path = require('path');
+import 'isomorphic-fetch'; // dependency of platform-client
+import 'abortcontroller-polyfill'; // dependency of platform-client
+import fs from 'fs';
+import path from 'path';
 
-const INPUT_FILE = path.join('data', 'input2.txt');
+
+const INPUT_FILE = path.join('data', 'input.txt');
 
 
 const parseCurl = (curlCmd) => {
@@ -32,6 +36,43 @@ const writeJson = (data, fileName) => {
   fs.writeFileSync(path.join('data', fileName), JSON.stringify(data, null, 2));
 };
 
+const createPlatformClient = (request) => {
+
+  let environment = Environment.prod;
+  let region = Region.US;
+
+  const endpoint = (request.headers?.authority || '').toLowerCase();
+
+  if (endpoint.startsWith('platformqa')) environment = Environment.staging;
+  else if (endpoint.startsWith('platformdev')) environment = Environment.dev;
+  else if (endpoint.startsWith('platformhipaa')) environment = Environment.hipaa;
+
+  if ((/^platform\w*-au/i).test(endpoint)) region = Region.AU;
+  else if ((/^platform\w*-eu/i).test(endpoint)) region = Region.EU;
+
+  const bearer = request.headers?.authorization || '';
+  let apiKeyOrToken = bearer.replace(/^Bearer\s+/gi, '').trim();
+
+  // check for an Admin token in 'data/api.key'
+  try {
+    apiKeyOrToken = fs.readFileSync(path.join('data', 'api.key')).toString().trim();
+  }
+  catch (e) {
+    console.warn('did not find a valid "data/api.key"');
+  }
+
+  return new PlatformClient({
+    accessToken: apiKeyOrToken || 'Missing-Token',
+    organizationId: request.queries?.organizationId,
+    environment,
+    region,
+  });
+};
+
+const errorHandler = (err) => {
+  console.warn(err);
+};
+
 //
 // main
 //
@@ -41,5 +82,16 @@ const input = fs.readFileSync(INPUT_FILE).toString();
 // parse
 const request = parseCurl(input);
 // write output
-writeJson(request, 'output.json');
+writeJson(request, 'request.json');
 
+// Find pipelines and save in data/pipelines.json
+const platformClient = createPlatformClient(request);
+
+platformClient.pipeline.list({ perPage: 1000 }).then(
+  response => {
+    writeJson(response, 'pipelines.json');
+  },
+  errorHandler
+);
+
+console.log('\nDone.\n');
