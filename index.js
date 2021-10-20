@@ -69,6 +69,14 @@ const createPlatformClient = (request) => {
   });
 };
 
+const sendRequest = async (request) => {
+  const r = { ...request }; // copy it to put back 'data' as a JSON string
+  r.body = JSON.stringify(r.data);
+  const response = await fetch(r.raw_url, r);
+  const data = await response.json();
+  return data;
+};
+
 const errorHandler = (message, err) => {
   console.warn(message, err);
 };
@@ -88,8 +96,18 @@ console.log('Request parsed.');
 // Find pipelines and save in data/pipelines.json
 const platformClient = createPlatformClient(request);
 
-console.log('Pipelines (list).');
-const pipelines = await platformClient.pipeline.list({ perPage: 1000 }).catch(errorHandler.bind(null, 'Pipelines (list) - Error'));
+console.log('Pipelines (list) for org: \x1b[33m%s\x1b[0m', request.queries?.organizationId);
+const pipelines = await platformClient.pipeline.list({ perPage: 1000 }).catch(errorHandler.bind(null, 'Pipelines (list) - Error - Check the token in data/api.key. Expired? \n'));
+console.log(`Pipelines (list) - Got ${pipelines.length} pipelines.`);
 writeJson(pipelines, 'pipelines.json');
+
+// Run the cURL request with Debug
+console.log('Run the request with Debug');
+request.data.debug = true;
+
+console.log('execute request');
+const response = await sendRequest(request);
+writeJson(response, 'response.json');
+console.log('Request saved in \x1b[33m%s\x1b[0m', 'response.json');
 
 console.log('\nDone.\n');
