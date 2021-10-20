@@ -69,8 +69,8 @@ const createPlatformClient = (request) => {
   });
 };
 
-const errorHandler = (err) => {
-  console.warn(err);
+const errorHandler = (message, err) => {
+  console.warn(message, err);
 };
 
 //
@@ -83,15 +83,13 @@ const input = fs.readFileSync(INPUT_FILE).toString();
 const request = parseCurl(input);
 // write output
 writeJson(request, 'request.json');
+console.log('Request parsed.');
 
 // Find pipelines and save in data/pipelines.json
 const platformClient = createPlatformClient(request);
 
-platformClient.pipeline.list({ perPage: 1000 }).then(
-  response => {
-    writeJson(response, 'pipelines.json');
-  },
-  errorHandler
-);
+console.log('Pipelines (list).');
+const pipelines = await platformClient.pipeline.list({ perPage: 1000 }).catch(errorHandler.bind(null, 'Pipelines (list) - Error'));
+writeJson(pipelines, 'pipelines.json');
 
 console.log('\nDone.\n');
