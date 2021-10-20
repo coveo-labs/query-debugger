@@ -11,32 +11,42 @@ const INPUT_FILE = path.join('data', 'input.txt');
 const fieldsToKeepFromPipeline = ['id', 'name', 'condition', 'statements'];
 const fieldsToKeepFromStatements = ['id', 'feature', 'definition', 'condition', 'detailed'];
 const scriptTranslators = [
+  { from: /not \( (\$\w+) ?\[(\w+)\] isPopulated \)/gm, to: `($1['$2']==undefined)` },
+  { from: /(\$\w+) ?\[(\w+)\] isPopulated/gm, to: `($1['$2']!=undefined)` },
+  { from: /not \( (\$\w+) ?\[(\w+)\] isEmpty \)/gm, to: `($1['$2']!="")` },
+  { from: /(\$\w+) ?\[(\w+)\] isEmpty/gm, to: `($1['$2']=="" || $1['$2']==undefined)` },
+  { from: /(\$\w+) ?\[(\w+)\] is not "(.*?)"/gm, to: `($1['$2']!=="$3")` },
+  { from: /(\$\w+) ?\[(\w+)\] is "(.*?)"/gm, to: `($1['$2']=="$3")` },
+  { from: /(\$\w+) ?\[(\w+)\] matches "(.*?)"/gm, to: `($1['$2']=="$3")` },
+  { from: /(\$\w+) ?\[(\w+)\] doesn't match "(.*?)"/gm, to: `($1['$2']!="$3")` },
+  { from: /(\$\w+) ?\[(\w+)\] contains "(.*?)"?/gm, to: `($1['$2'].indexOf("$3")!=-1)` },
+  { from: /(\$\w+) ?\[(\w+)\] doesn't contain "(.*?)"/gm, to: `($1['$2'].indexOf("$3")==-1)` },
+  { from: /(\$\w+) ?\[(\w+)\] is not (.*?) /gm, to: `($1['$2']!=="$3")` },
+  { from: /(\$\w+) ?\[(\w+)\] is (.*?) /gm, to: `($1['$2']=="$3")` },
+  { from: /(\$\w+) ?\[(\w+)\] matches (.*?) /gm, to: `($1['$2']=="$3")` },
+  { from: /(\$\w+) ?\[(\w+)\] doesn't match (.*?) /gm, to: `($1['$2']!="$3")` },
+  { from: /(\$\w+) ?\[(\w+)\] contains (.*?) /gm, to: `($1['$2'].indexOf("$3")!=-1)` },
+  { from: /(\$\w+) ?\[(\w+)\] doesn't contain (.*?) /gm, to: `($1['$2'].indexOf("$3")==-1)` },
   { from: /not \( (\$\w+) isEmpty \)/gm, to: `($1!="")` },
-  { from: /(\$\w+) is not "?(\w+)"?/gm, to: `($1!=="$2")` },
-  { from: /(\$\w+) is not "?(\S+)"/gm, to: `($1!=="$2")` },
-  { from: /(\$\w+) is "?(\w+)"?/gm, to: `($1=="$2")` },
-  { from: /(\$\w+) is "?(\S+)"/gm, to: `($1=="$2")` },
-  { from: /(\$\w+) matches "?(\w+)"?/gm, to: `($1=="$2")` },
-  { from: /(\$\w+) doesn't match "?(\w+)"?/gm, to: `($1!="$2")` },
-  { from: /(\$\w+) matches "?(\S+)"/gm, to: `($1=="$2")` },
-  { from: /(\$\w+) doesn't match "?(\S+)"/gm, to: `($1!="$2")` },
+  { from: /(\$\w+) is not "(.*?)"/gm, to: `($1!=="$2")` },
+  { from: /(\$\w+) is "(.*?)"/gm, to: `($1=="$2")` },
+  { from: /(\$\w+) matches "(.*?)"/gm, to: `($1=="$2")` },
+  { from: /(\$\w+) doesn't match "(.*?)"/gm, to: `($1!="$2")` },
   { from: /(\$\w+) isEmpty/gm, to: `($1=="" || $1==undefined)` },
-  { from: /(\$\w+) contains "?(\w+)"?/gm, to: `($1.indexOf("$2")!=-1)` },
+  { from: /(\$\w+) contains "(.*?)"/gm, to: `($1.indexOf("$2")!=-1)` },
+  { from: /(\$\w+) doesn't contain "(.*?)"/gm, to: `($1.indexOf("$2")==-1)` },
+
+  { from: /(\$\w+) is not (.*?) /gm, to: `($1!=="$2")` },
+  { from: /(\$\w+) is (.*?) /gm, to: `($1=="$2")` },
+  { from: /(\$\w+) matches (.*?) /gm, to: `($1=="$2")` },
+  { from: /(\$\w+) doesn't match (.*?) /gm, to: `($1!="$2")` },
+  { from: /(\$\w+) contains (.*?) /gm, to: `($1.indexOf("$2")!=-1)` },
+  { from: /(\$\w+) doesn't contain (.*?) /gm, to: `($1.indexOf("$2")==-1)` },
+
   { from: /not \( (\$\w+) isPopulated \)/gm, to: `($1==undefined)` },
   { from: /(\$\w+) isPopulated/gm, to: `($1!=undefined)` },
-  { from: /not \( (\$\w+) (\[\w+\]) isPopulated \)/gm, to: `($1$2==undefined)` },
-  { from: /(\$\w+) ?(\[\w+\]) isPopulated/gm, to: `($1$2!=undefined)` },
-  { from: /not \( (\$\w+) ?(\[\w+\]) isEmpty \)/gm, to: `($1$2!="")` },
-  { from: /(\$\w+) ?(\[\w+\]) isEmpty/gm, to: `($1$2=="" || $1$2==undefined)` },
-  { from: /(\$\w+) ?(\[\w+\]) is not "?(\S+)"?/gm, to: `($1$2!=="$3")` },
-  { from: /(\$\w+) ?(\[\w+\]) is "?(\S+)"?/gm, to: `($1$2=="$3")` },
-  { from: /(\$\w+) ?(\[\w+\]) matches "?(\S+)"?/gm, to: `($1$2=="$3")` },
-  { from: /(\$\w+) ?(\[\w+\]) doesn't match "?(\S+)"?/gm, to: `($1$2!="$3")` },
-  { from: /(\$\w+) ?(\[\w+\]) contains "?(\S+)"?/gm, to: `($1$2.indexOf("$3")!=-1)` },
-  { from: /(\$\w+) doesn't contain "?(\w+)"?/gm, to: `($1.indexOf("$2")==-1)` },
-  { from: /(\$\w+) ?(\[\w+\]) doesn't contain "?(\S+)"?/gm, to: `($1$2.indexOf("$3")==-1)` },
   { from: / and /gm, to: ` && ` },
-  { from: / or /gm, to: ` || ` },
+  { from: / or /gm, to: ` || ` }
 ]
 const addFull = false;
 
@@ -85,6 +95,7 @@ const cleanDefinition = (definition) => {
 }
 
 const cleanScript = (condition) => {
+  condition = condition + ' ';
   scriptTranslators.map(script => {
     condition = condition.replace(script.from, script.to);
   });
