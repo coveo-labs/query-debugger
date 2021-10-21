@@ -17,7 +17,7 @@ const curlHelper = {
     }
     catch (e) {
       // no-op
-      console.warn('Parse error: ', e);
+      //console.warn('Parse error: ', e);
     }
 
     return json;
@@ -27,6 +27,10 @@ const curlHelper = {
     const r = { ...request }; // copy it to put back 'data' as a JSON string
     r.body = JSON.stringify(r.data);
     r.mode = 'no-cors';
+    r.method = 'POST';
+    r.raw_url = r.raw_url.replace(/"/gm, '');
+    r.raw_url = r.raw_url.replace(/'/gm, '');
+
     const response = await fetch(r.raw_url, r);
     const data = await response.json();
     return data;

@@ -10,6 +10,7 @@ import Pipelines from './src/Pipelines.js';
 
 const INPUT_FILE = path.join('data', 'input.txt');
 
+const prefix = "dellsandbox_";
 
 const parseCurl = (curlCmd) => {
   const jsonString = curlconverter.toJsonString(curlCmd);
@@ -21,9 +22,9 @@ const parseCurl = (curlCmd) => {
   // }
 
   try {
-    const data = Object.keys(json.data)[0];
-    console.log(data);
-    json.data = JSON.parse(data);
+    //const data = Object.keys(json.data)[0];
+    //console.log(data);
+    //json.data = JSON.parse(data);
   }
   catch (e) {
     // no-op
@@ -34,7 +35,15 @@ const parseCurl = (curlCmd) => {
 };
 
 const writeJson = (data, fileName) => {
-  fs.writeFileSync(path.join('data', fileName), JSON.stringify(data, null, 2));
+  let json = JSON.stringify(data, null, 2);
+  let buff = new Buffer.from(json);
+  let base64data = buff.toString('base64');
+  fs.writeFileSync(path.join('data', fileName), base64data);
+};
+
+const writeJsonPlain = (data, fileName) => {
+  let json = JSON.stringify(data, null, 2);
+  fs.writeFileSync(path.join('data', fileName), json);
 };
 
 const createPlatformClient = (request) => {
@@ -72,8 +81,13 @@ const createPlatformClient = (request) => {
 };
 
 const sendRequest = async (request) => {
+  console.log(request);
   const r = { ...request }; // copy it to put back 'data' as a JSON string
   r.body = JSON.stringify(r.data);
+  r.method = 'POST';
+  r.raw_url = r.raw_url.replace(/"/gm, '');
+  r.raw_url = r.raw_url.replace(/'/gm, '');
+  console.log(r.raw_url);
   const response = await fetch(r.raw_url, r);
   const data = await response.json();
   return data;
@@ -89,7 +103,8 @@ const input = fs.readFileSync(INPUT_FILE).toString();
 // parse
 const request = parseCurl(input);
 // write output
-writeJson(request, 'request.json');
+writeJson(request, prefix + '_request.json');
+writeJsonPlain(request, prefix + '_request_plain.json');
 console.log('Request parsed.');
 
 // Find pipelines and save in data/pipelines.json
@@ -103,7 +118,8 @@ const pipelines = new Pipelines(platformClient);
 console.log('Getting QPLs');
 await pipelines.getQPL().then(content => {
   console.log(content);
-  writeJson(content, 'pipelines.json');
+  writeJson(content, prefix + '_pipelines.json');
+  writeJsonPlain(content, prefix + '_pipelines_plain.json');
 });
 
 
@@ -113,7 +129,7 @@ request.data.debug = true;
 
 console.log('execute request');
 const response = await sendRequest(request);
-writeJson(response, 'response.json');
-console.log('Request saved in \x1b[33m%s\x1b[0m', 'response.json');
+writeJson(response, prefix + '_response.json');
+console.log('Request saved in \x1b[33m%s\x1b[0m', prefix + '_response.json');
 
 console.log('\nDone.\n');
