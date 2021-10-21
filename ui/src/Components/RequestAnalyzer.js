@@ -232,6 +232,7 @@ export default function RequestAnalyzer(props) {
     });
 
     props.setPipelines(state.pipelines);
+    window.STATE.pipelines = state.pipelines;
   }
   let executionReport = null;
   //console.log(state.response, window.STATE.response);
