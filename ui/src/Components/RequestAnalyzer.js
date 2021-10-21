@@ -55,6 +55,17 @@ export default function RequestAnalyzer() {
     } else return "No condition set";
   };
 
+  const checkInExecReport = (condition) => {
+    //Checks if condition inside execution report
+    if (condition) {
+      let conditionToCheck = condition.clean_definition;
+      if (conditionToCheck !== "") {
+        let result = checkQueryField(conditionToCheck);
+        return result ? "Yes" : "No";
+      }
+    } else return "No condition set";
+  };
+
   const addRequestTranslators = (req) => {
     REQUEST_TRANSLATORS.forEach(field => {
       try {
@@ -92,6 +103,7 @@ export default function RequestAnalyzer() {
   };
 
   let parameters = null;
+  let finalAnalysis = {};
   if (state.request?.data) {
     parameters = Object.entries(state.request?.data).map(([key, value]) => {
       return <TextField
@@ -106,6 +118,7 @@ export default function RequestAnalyzer() {
   let pipelineReport = null;
   //console.log(state.pipelines);
   let pipelineSelected = false;
+  let pipelineName = '';
   if (state.pipelines.length > 0) {
     console.log("Render pipelines");
     pipelineReport = state.pipelines.map((row, idx) => {
@@ -117,6 +130,7 @@ export default function RequestAnalyzer() {
         if (valid === "Yes") {
           if (pipelineSelected === false) {
             pipelineSelected = true;
+            pipelineName = row.name;
             conditionUsed = "Yes";
             state.pipelines[idx]['used'] = true;
           }
@@ -150,6 +164,7 @@ export default function RequestAnalyzer() {
           let conditionUsed = "Yes";
           state.pipelines[idx]['used'] = true;
           state.pipelines[idx]['valid'] = false;
+          pipelineName = row.name;
           if (valid === "Yes") {
             state.pipelines[idx]['valid'] = true;
           }
@@ -172,11 +187,15 @@ export default function RequestAnalyzer() {
   }
   console.log(pipelineReportDefault);
 
+  //Add pipeline final analysis
+  //finalAnalysis['Pipeline Validation']=state.request?.data['pipeline']==pipelineName;
+
+
   let pipelineReportDetails = null;
   //continue with the pipeline analysis
   if (state.pipelines.length > 0) {
     console.log("Render default pipelines");
-    state.pipelines.map((row, idx) => {
+    state.pipelines.forEach((row, idx) => {
       if (state.pipelines[idx]['used'] === true) {
         console.log(state.pipelines[idx].statements);
         pipelineReportDetails = state.pipelines[idx].statements.map((statement, idxs) => {
@@ -184,6 +203,7 @@ export default function RequestAnalyzer() {
           let conditionUsed = "No";
           state.pipelines[idx].statements[idxs]['valid'] = false;
           state.pipelines[idx].statements[idxs]['used'] = false;
+          state.pipelines[idx].statements[idxs]['inExecutionReport'] = checkInExecReport(statement.condition);
           if (valid === "Yes") {
             state.pipelines[idx].statements[idxs]['valid'] = true;
             state.pipelines[idx].statements[idxs]['used'] = true;
@@ -209,8 +229,9 @@ export default function RequestAnalyzer() {
           </TableRow>;
         });
       }
-      return null;
     });
+
+    window.STATE.pipelines = state.pipelines;
   }
   let executionReport = null;
   //console.log(state.response, window.STATE.response);
@@ -252,15 +273,15 @@ export default function RequestAnalyzer() {
           </div>
           <h3>Pipeline Report</h3>
           {pipelineReport && <TableContainer component={Paper}>
-            <Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
+            <Table sx={{ minWidth: 650, maxWidth: 850, wordBreak: 'break-word', overflowWrap: 'break-word' }} size="small" aria-label="a dense table">
               <TableHead>
                 <TableRow>
-                  <TableCell></TableCell>
-                  <TableCell>Name</TableCell>
+                  <TableCell style={{ width: 50 }}></TableCell>
+                  <TableCell style={{ width: 200 }}>Name</TableCell>
                   <TableCell>Condition</TableCell>
                   <TableCell>Check Condition</TableCell>
-                  <TableCell>Meets Query</TableCell>
-                  <TableCell>Used</TableCell>
+                  <TableCell style={{ width: 100 }}>Meets Query</TableCell>
+                  <TableCell style={{ width: 50 }}>Used</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -271,15 +292,15 @@ export default function RequestAnalyzer() {
           </TableContainer>}
           <h3>Selected Pipeline Report</h3>
           {pipelineReportDetails && <TableContainer component={Paper}>
-            <Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
+            <Table sx={{ minWidth: 650, maxWidth: 850, wordBreak: 'break-word', overflowWrap: 'break-word' }} size="small" aria-label="a dense table">
               <TableHead>
                 <TableRow>
-                  <TableCell></TableCell>
-                  <TableCell>Name</TableCell>
+                  <TableCell style={{ width: 50 }}></TableCell>
+                  <TableCell style={{ width: 200 }}>Name</TableCell>
                   <TableCell>Condition</TableCell>
                   <TableCell>Check Condition</TableCell>
-                  <TableCell>Meets Query</TableCell>
-                  <TableCell>Used</TableCell>
+                  <TableCell style={{ width: 50 }}>Meets Query</TableCell>
+                  <TableCell style={{ width: 50 }}>Used</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
