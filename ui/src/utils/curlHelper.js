@@ -16,7 +16,7 @@ const curlHelper = {
     }
     catch (e) {
       // no-op
-      console.warn('Parse error: ', e);
+      //console.warn('Parse error: ', e);
     }
 
     return json;

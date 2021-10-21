@@ -20,10 +20,12 @@ export default function RequestLoader() {
   };
 
   const loadSample = (name) => {
-    const req = Buffer.from(curlSamples[name + '_request'], 'base64').toString();
-    const res = Buffer.from(curlSamples[name + '_response'], 'base64').toString();
-    window.STATE.curl = req;
+    const req = Buffer.from(curlSamples[name + '__request'], 'base64').toString();
+    const res = Buffer.from(curlSamples[name + '__response'], 'base64').toString();
+    const pipelines = Buffer.from(curlSamples[name + '__pipelines'], 'base64').toString();
+    //window.STATE.curl = req;
     window.STATE.response = res;
+    window.STATE.pipelines = pipelines;
     setValue(req);
   };
 
@@ -44,6 +46,13 @@ export default function RequestLoader() {
         </AppBar>
 
         <DialogContent>
+          <div>
+            <h3>Samples:</h3>
+            <ButtonGroup variant="outlined" aria-label="outlined primary button group">
+              <Button onClick={() => loadSample('dellsandbox')} primary  >Dell Sandbox</Button>
+              <Button onClick={() => loadSample('fashion')}>Fashion</Button>
+            </ButtonGroup>
+          </div>
           <DialogContentText>
             Paste your cURL command below
           </DialogContentText>
@@ -58,13 +67,6 @@ export default function RequestLoader() {
             onChange={handleChange}
             value={value}
           />
-          <div>
-            <h3>Samples:</h3>
-            <ButtonGroup variant="outlined" aria-label="outlined primary button group">
-              <Button onClick={() => loadSample('dellsandbox')} primary  >Dell Sandbox</Button>
-              <Button onClick={() => loadSample('fashion')}>Fashion</Button>
-            </ButtonGroup>
-          </div>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Cancel</Button>
