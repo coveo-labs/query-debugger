@@ -20,13 +20,16 @@ export default function RequestLoader() {
   };
 
   const loadSample = (name) => {
-    const sample = Buffer.from(curlSamples[name], 'base64');
-    setValue(sample);
+    const req = Buffer.from(curlSamples[name + '_request'], 'base64').toString();
+    const res = Buffer.from(curlSamples[name + '_response'], 'base64').toString();
+    window.STATE.curl = req;
+    window.STATE.response = res;
+    setValue(req);
   };
 
   return (
     <>
-      <Button variant="outlined" onClick={handleClickOpen}>
+      <Button variant="contained" onClick={handleClickOpen}>
         Set cURL request
       </Button>
       <Dialog open={open} onClose={handleClose} fullScreen>
