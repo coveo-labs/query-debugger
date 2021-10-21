@@ -13,15 +13,11 @@ const Details = (props) => {
     setExpanded(isExpanded ? index : false);
   };
 
-  const selectLabel = (label) => {
-    switch (label) {
-      case 'rankingweight':
-        return label = 'Ranking Weight';
-      case 'queryParamOverride':
-        return label = 'Query Parameters';
-      default:
-        return label;
+  const selectLabel = (fData) => {
+    if (fData.definition) {
+      return fData.definition;
     }
+    return fData.label;
   };
 
   return (
@@ -36,16 +32,15 @@ const Details = (props) => {
               aria-controls="panel1bh-content"
               id="panel1bh-header"
             >
-              <Typography sx={{ width: '33%', flexShrink: 0, textTransform: 'uppercase' }}>
+              <Typography sx={{ width: '90%', flexShrink: 0, textTransform: 'uppercase' }}>
                 {/* {fData.feature} */}
-                {selectLabel(fData.feature)}
+                {selectLabel(fData)}
               </Typography>
             </AccordionSummary>
             <AccordionDetails>
-              <Typography noWrap sx={{ color: 'text.secondary' }}>Condition Used: {fData.condition ? fData.condition.definition : fData.definition}</Typography>
-              <Typography noWrap>
-                {fData.detailed.expressions}
-              </Typography>
+              {fData.condition?.definition && <Typography noWrap sx={{ color: 'text.secondary' }}>Condition Used: {fData.condition.definition}</Typography>}
+              {fData.detailed.expressions && <Typography noWrap>{fData.detailed.expressions}</Typography>}
+              <Typography noWrap>{fData.feature} {fData.id}</Typography>
             </AccordionDetails>
           </Accordion>
         </>
