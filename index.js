@@ -42,7 +42,7 @@ const createPlatformClient = (request) => {
   let environment = Environment.prod;
   let region = Region.US;
 
-  const endpoint = (request.headers?.authority || '').toLowerCase();
+  const endpoint = (request.headers ?.authority || '').toLowerCase();
 
   if (endpoint.startsWith('platformqa')) environment = Environment.staging;
   else if (endpoint.startsWith('platformdev')) environment = Environment.dev;
@@ -51,7 +51,7 @@ const createPlatformClient = (request) => {
   if ((/^platform\w*-au/i).test(endpoint)) region = Region.AU;
   else if ((/^platform\w*-eu/i).test(endpoint)) region = Region.EU;
 
-  const bearer = request.headers?.authorization || '';
+  const bearer = request.headers ?.authorization || '';
   let apiKeyOrToken = bearer.replace(/^Bearer\s+/gi, '').trim();
 
   // check for an Admin token in 'data/api.key'
@@ -61,11 +61,11 @@ const createPlatformClient = (request) => {
   catch (e) {
     console.warn('did not find a valid "data/api.key"');
   }
-  console.log(request.queries?.organizationId);
+  console.log(request.queries ?.organizationId);
   console.log(apiKeyOrToken);
   return new PlatformClient({
     accessToken: apiKeyOrToken || 'Missing-Token',
-    organizationId: request.queries?.organizationId,
+    organizationId: request.queries ?.organizationId,
     environment,
     region,
   });

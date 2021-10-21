@@ -2,4 +2,5 @@
 *.key
 node_modules
 data/pipelines.json
+data/input.txt
 temp/*
