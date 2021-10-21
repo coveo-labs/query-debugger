@@ -1,3 +1,5 @@
+import { FEATURE_TYPES } from "./constants";
+
 const elements = [
   {
     id: '1',
@@ -5,6 +7,12 @@ const elements = [
     data: { label: 'Parse Query' },
     position: { x: 50, y: 50 },
     sourcePosition: 'right',
+    style: {
+      backgroundColor: 'rgb(0, 173, 255)',
+      color: 'white',
+      height: '35px',
+      fontSize: '16px'
+    }
   },
 
   {
@@ -14,46 +22,87 @@ const elements = [
     targetPosition: 'left',
     sourcePosition: 'right',
     position: { x: 300, y: 50 },
+    style: {
+      backgroundColor: 'rgb(0, 173, 255)',
+      color: 'white',
+      height: '35px',
+      fontSize: '16px'
+    }
   },
   {
     id: '3',
     type: 'default',
-    data: { label: 'apply Query Parameters' },
+    data: { label: 'Apply Query Parameters' },
+    value: FEATURE_TYPES.QUERY_PARAM_OVERRIDE,
     targetPosition: 'left',
     sourcePosition: 'right',
     position: { x: 550, y: 50 },
+    style: {
+      backgroundColor: '#ededed',
+      color: '#333333',
+      height: '35px',
+      fontSize: '16px'
+    }
   },
   {
     id: '4',
     type: 'default',
     data: { label: 'Apply Thesaurus rules' },
+    value: FEATURE_TYPES.THESAURUS,
     targetPosition: 'left',
     sourcePosition: 'bottom',
     position: { x: 800, y: 50 },
+    style: {
+      backgroundColor: '#ededed',
+      color: '#333333',
+      height: '35px',
+      fontSize: '16px'
+    }
   },
   {
     id: '5',
     type: 'default',
     data: { label: 'Apply Stop words' },
+    value: FEATURE_TYPES.STOP_WORD,
     targetPosition: 'top',
     sourcePosition: 'left',
     position: { x: 800, y: 150 },
+    style: {
+      backgroundColor: '#ededed',
+      color: '#333333',
+      height: '35px',
+      fontSize: '16px'
+    }
   },
   {
     id: '6',
     type: 'default',
     data: { label: 'Apply Filters rules' },
+    value: FEATURE_TYPES.FILTER,
     targetPosition: 'right',
     sourcePosition: 'left',
     position: { x: 550, y: 150 },
+    style: {
+      backgroundColor: '#ededed',
+      color: '#333333',
+      height: '35px',
+      fontSize: '16px'
+    }
   },
   {
     id: '7',
     type: 'default',
     data: { label: 'Query ranking expressions' },
+    value: FEATURE_TYPES.RANKING,
     targetPosition: 'right',
     sourcePosition: 'left',
-    position: { x: 300, y: 143 },
+    position: { x: 300, y: 150 },
+    style: {
+      backgroundColor: '#ededed',
+      color: '#333333',
+      height: '35px',
+      fontSize: '16px'
+    }
   },
   {
     id: '8',
@@ -62,14 +111,27 @@ const elements = [
     targetPosition: 'right',
     sourcePosition: 'bottom',
     position: { x: 50, y: 150 },
+    style: {
+      backgroundColor: '#ededed',
+      color: '#333333',
+      height: '35px',
+      fontSize: '16px'
+    }
   },
   {
     id: '9',
     type: 'default',
     data: { label: 'Apply Ranking weight' },
+    value: FEATURE_TYPES.RANKING_WEIGHT,
     targetPosition: 'top',
     sourcePosition: 'right',
     position: { x: 50, y: 250 },
+    style: {
+      backgroundColor: '#ededed',
+      color: '#333333',
+      height: '35px',
+      fontSize: '16px'
+    }
   },
   {
     id: '10',
@@ -77,7 +139,13 @@ const elements = [
     data: { label: 'Apply ML Event Recommendations' },
     targetPosition: 'left',
     sourcePosition: 'right',
-    position: { x: 300, y: 243 },
+    position: { x: 300, y: 250 },
+    style: {
+      backgroundColor: '#ededed',
+      color: '#333333',
+      height: '35px',
+      fontSize: '16px'
+    }
   },
   {
     id: '11',
@@ -86,6 +154,12 @@ const elements = [
     targetPosition: 'left',
     sourcePosition: 'right',
     position: { x: 550, y: 250 },
+    style: {
+      backgroundColor: '#ededed',
+      color: '#333333',
+      height: '35px',
+      fontSize: '16px'
+    }
   },
   {
     id: '12',
@@ -94,6 +168,12 @@ const elements = [
     targetPosition: 'left',
     sourcePosition: 'bottom',
     position: { x: 800, y: 250 },
+    style: {
+      backgroundColor: '#ededed',
+      color: '#333333',
+      height: '35px',
+      fontSize: '16px'
+    }
   },
   {
     id: '13',
@@ -102,12 +182,25 @@ const elements = [
     targetPosition: 'top',
     sourcePosition: 'left',
     position: { x: 800, y: 350 },
+    style: {
+      backgroundColor: '#ededed',
+      color: '#333333',
+      height: '35px',
+      fontSize: '16px'
+    }
   }, {
     id: '14',
     type: 'output',
     data: { label: 'Apply trigger rules' },
     targetPosition: 'right',
     position: { x: 550, y: 350 },
+    style: {
+      backgroundColor: '#ededed',
+      color: '#333333',
+      borderColor: 'black',
+      height: '35px',
+      fontSize: '16px'
+    }
   },
 
   { id: 'e1-2', source: '1', target: '2', type: 'straight' },
