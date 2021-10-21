@@ -1,9 +1,7 @@
 .DS_Store
 *.key
 node_modules
-data/*pipelines.json
-data/*request.json
-data/*response.json
+data/*.json
 data/input.txt
 data/response.json
 temp/*
