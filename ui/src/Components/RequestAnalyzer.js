@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { AppBar, Button, Dialog, DialogContent, IconButton, TextField, Toolbar, Typography, requirePropFactory } from '@mui/material';
+import { AppBar, Button, Dialog, DialogContent, IconButton, TextField, Toolbar, Typography } from '@mui/material';
 import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 
@@ -9,7 +9,7 @@ const REQUEST_TRANSLATORS = [
   { from: 'locale', to: 'language' },
   { from: 'aq', to: 'advancedQuery' },
   { from: 'dq', to: 'disjunctionQuery' }
-]
+];
 export default function RequestAnalyzer() {
   const [open, setOpen] = React.useState(false);
   const [state, setState] = React.useState({ request: {}, response: {}, pipelines: [] });
@@ -20,7 +20,7 @@ export default function RequestAnalyzer() {
   const checkQueryField = (condition) => {
     let fieldFound = false;
     let result = false;
-    Object.entries(state.request ?.data).map(([key, value]) => {
+    Object.entries(state.request?.data).forEach(([key, value]) => {
       let fieldValue = `\\$${key}`;
       const regex = new RegExp(fieldValue);
       //Check if fieldValue is within condition
@@ -40,11 +40,9 @@ export default function RequestAnalyzer() {
     });
     if (fieldFound) {
       return result;
-    } else {
-      return false;
     }
-    //return false;
-  }
+    return false;
+  };
 
   const checkCondition = (condition) => {
     //Checks if condition is met by the query
@@ -55,19 +53,18 @@ export default function RequestAnalyzer() {
         return result ? "Yes" : "No";
       }
     } else return "No condition set";
-  }
+  };
 
   const addRequestTranslators = (req) => {
-    REQUEST_TRANSLATORS.map(field => {
+    REQUEST_TRANSLATORS.forEach(field => {
       try {
         req.data[field.to] = req.data[field.from];
       }
       catch (e) {
-
       }
     });
     return req;
-  }
+  };
 
   const analyzeRequest = async () => {
     const cURL = window.STATE.curl;
@@ -76,28 +73,13 @@ export default function RequestAnalyzer() {
       alert('NOT A VALID CURL');
       return;
     }
+
     let req = curlHelper.parseCurl(cURL);
     req = addRequestTranslators(req);
     console.log(req);
-    // =======================================
-    // CANNOT DO REQUESTS BECAUSE OF CORS - using a sample
-    //
-    // const res = await curlHelper.sendRequest(req);
-    // =======================================
-    /*let req = {};
-    try {
-      req = JSON.parse(window.STATE.curl);
-    }
-    catch (e) {
-      console.log(e);
-    }*/
-    let response = {};
-    try {
-      response = JSON.parse(window.STATE.response);
-    }
-    catch (e) {
-      console.log(e);
-    }
+
+    const response = await curlHelper.sendRequest(req);
+
     let pipelines = [];
     try {
       console.log(window.STATE.pipelines);
@@ -106,12 +88,12 @@ export default function RequestAnalyzer() {
     catch (e) {
       console.log(e);
     }
-    setState({ request: req, response: response, pipelines: pipelines });
+    setState({ request: req, response, pipelines });
   };
 
   let parameters = null;
-  if (state.request ?.data) {
-    parameters = Object.entries(state.request ?.data).map(([key, value]) => {
+  if (state.request?.data) {
+    parameters = Object.entries(state.request?.data).map(([key, value]) => {
       return <TextField
         id={'tf--' + key}
         key={'tf--' + key}
@@ -147,12 +129,13 @@ export default function RequestAnalyzer() {
           <TableCell scope="row">
             {row.name}
           </TableCell>
-          <TableCell align="left">{row.condition ?.definition}</TableCell>
-          <TableCell align="left">{row.condition ?.clean_definition}</TableCell>
+          <TableCell align="left">{row.condition?.definition}</TableCell>
+          <TableCell align="left">{row.condition?.clean_definition}</TableCell>
           <TableCell align="right">{valid}</TableCell>
           <TableCell align="right">{conditionUsed}</TableCell>
         </TableRow>;
       }
+      return null;
     });
   }
   //If no pipeline selected: find the default one
@@ -177,12 +160,13 @@ export default function RequestAnalyzer() {
             <TableCell scope="row">
               {row.name}
             </TableCell>
-            <TableCell align="left">{row.condition ?.definition}</TableCell>
-            <TableCell align="left">{row.condition ?.clean_definition}</TableCell>
+            <TableCell align="left">{row.condition?.definition}</TableCell>
+            <TableCell align="left">{row.condition?.clean_definition}</TableCell>
             <TableCell align="right">{valid}</TableCell>
             <TableCell align="right">{conditionUsed}</TableCell>
           </TableRow>;
         }
+        return null;
       });
     }
   }
@@ -211,26 +195,27 @@ export default function RequestAnalyzer() {
             state.pipelines[idx].statements[idxs]['used'] = true;
             conditionUsed = "Yes";
           }
-          return <TableRow key={statement.id} class={'valid' + state.pipelines[idx].statements[idxs]['valid']+' used' + state.pipelines[idx].statements[idxs]['used']}>
+          return <TableRow key={statement.id} class={'valid' + state.pipelines[idx].statements[idxs]['valid'] + ' used' + state.pipelines[idx].statements[idxs]['used']}>
             <TableCell scope="row">
               {idxs + 1}
             </TableCell>
             <TableCell scope="row">
               {statement.feature} - {statement.definition}
             </TableCell>
-            <TableCell align="left">{statement.condition ?.definition}</TableCell>
-            <TableCell align="left">{statement.condition ?.clean_definition}</TableCell>
+            <TableCell align="left">{statement.condition?.definition}</TableCell>
+            <TableCell align="left">{statement.condition?.clean_definition}</TableCell>
             <TableCell align="right">{valid}</TableCell>
             <TableCell align="right">{conditionUsed}</TableCell>
           </TableRow>;
         });
       }
+      return null;
     });
   }
   let executionReport = null;
   //console.log(state.response, window.STATE.response);
-  if (state.response ?.executionReport) {
-    executionReport = state.response ?.executionReport.children.map((row, idx) => {
+  if (state.response?.executionReport) {
+    executionReport = state.response?.executionReport.children.map((row, idx) => {
       return <TableRow key={row.name}>
         <TableCell scope="row">
           {idx}
@@ -260,7 +245,7 @@ export default function RequestAnalyzer() {
         <DialogContent>
           <Button variant="contained" onClick={analyzeRequest}>Analyze</Button>
           <h3>
-            Parameters:{state.request ?.data && <span>{state.request ?.data.length}</span>}
+            Parameters:{state.request?.data && <span>{state.request?.data.length}</span>}
           </h3>
           <div>
             {parameters}
