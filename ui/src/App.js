@@ -5,11 +5,16 @@ import { FormControl, InputLabel, MenuItem, Grid, Select } from '@mui/material';
 import pipelineData from './data/pipelines.json';
 import initialElements from './utils/elements';
 import Details from './Components/Details';
+import RequestLoader from './Components/RequestLoader';
+import RequestAnalyzer from './Components/RequestAnalyzer';
 
+// OK, this is cheating and bad, I know...
+// should use a proper React Context, just taking a shortcut for now
+window.STATE = { curl: '' };
 
 const App = () => {
   const [elements, setElements] = useState(initialElements);
-  const [queryPipeline, setqueryPipeline] = useState('');
+  const [queryPipeline, setQueryPipeline] = useState('');
   const [selectedPipelineData, setSelectedPipelineData] = useState(pipelineData.find(data => data.name === queryPipeline)?.statements ?? []);
 
   useEffect(() => {
@@ -38,13 +43,15 @@ const App = () => {
   }, [selectedPipelineData, queryPipeline]);
 
   const onPipelineSelect = (event) => {
-    setqueryPipeline(event.target.value);
+    setQueryPipeline(event.target.value);
     setSelectedPipelineData(pipelineData.find(data => data.name === event.target.value).statements);
   };
 
   return (
     <>
-      <div style={{ textAlign: 'center' }}><h1>Query Debugger</h1></div>
+      <h1 style={{ textAlign: 'center' }}>Query Debugger</h1>
+      <RequestLoader />
+      <RequestAnalyzer />
       <Grid container>
         <Grid item xs={12} md={12} lg={12} style={{ textAlign: 'end', marginRight: '2%' }}>
           <FormControl style={{ width: '200px' }}>

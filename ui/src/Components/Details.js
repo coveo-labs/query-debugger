@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 
 const Details = () => {
   return (<div style={{ height: '280px', border: '1px solid black', margin: '2%' }}>
