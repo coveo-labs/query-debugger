@@ -176,7 +176,7 @@ export default function RequestAnalyzer() {
   //continue with the pipeline analysis
   if (state.pipelines.length > 0) {
     console.log("Render default pipelines");
-    state.pipelines.map((row, idx) => {
+    state.pipelines.forEach((row, idx) => {
       if (state.pipelines[idx]['used'] === true) {
         console.log(state.pipelines[idx].statements);
         pipelineReportDetails = state.pipelines[idx].statements.map((statement, idxs) => {
@@ -209,8 +209,9 @@ export default function RequestAnalyzer() {
           </TableRow>;
         });
       }
-      return null;
     });
+
+    window.STATE.pipelines = state.pipelines;
   }
   let executionReport = null;
   //console.log(state.response, window.STATE.response);
