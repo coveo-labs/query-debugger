@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { AppBar, Button, Dialog, DialogContent, IconButton, TextField, Toolbar, Typography } from '@mui/material';
-import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, } from '@mui/material';
+import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, LinearProgress } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 
 import curlHelper from '../utils/curlHelper';
@@ -236,6 +236,7 @@ export default function RequestAnalyzer() {
   let executionReport = null;
   //console.log(state.response, window.STATE.response);
   if (state.response?.executionReport) {
+    const total = state.response.duration;
     executionReport = state.response?.executionReport.children.map((row, idx) => {
       return <TableRow key={row.name}>
         <TableCell scope="row">
@@ -244,7 +245,7 @@ export default function RequestAnalyzer() {
         <TableCell scope="row">
           {row.name}
         </TableCell>
-        <TableCell align="right">{row.duration}</TableCell>
+        <TableCell align="right">{row.duration} <LinearProgress variant="determinate" value={row.duration * 100 / total} /></TableCell>
       </TableRow>;
     });
   }
