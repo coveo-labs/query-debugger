@@ -5,7 +5,7 @@ import CloseIcon from '@mui/icons-material/Close';
 
 import curlSamples from '../data/curlSamples.json';
 
-export default function RequestLoader() {
+export default function RequestLoader(props) {
   const [open, setOpen] = React.useState(false);
   const [value, setValue] = React.useState('');
 
@@ -16,6 +16,7 @@ export default function RequestLoader() {
 
   const handleSave = () => {
     window.STATE.curl = value;
+    props.setPipelines(JSON.parse(window.STATE.pipelines));
     setOpen(false);
   };
 
