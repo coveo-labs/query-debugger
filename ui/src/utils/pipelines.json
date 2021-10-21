@@ -1,0 +1,215 @@
+[
+  {
+    "id": "efbc6db8-e83d-4ad4-b8d2-fcfa4cf69ae1",
+    "name": "default",
+    "condition": null,
+    "statements": []
+  },
+  {
+    "id": "5649063d-fcb9-4489-a76c-7d181efb405d",
+    "name": "Search",
+    "condition": null,
+    "statements": [
+      {
+        "id": "96f8ac2e-b6b5-4c3e-b4cd-2d02196133fd",
+        "feature": "filter",
+        "definition": "filter dq `(@objecttype==Product)([[@ec_item_group_id]($query) ($originalQuery)($facetsFilter)])`",
+        "detailed": {
+          "expressions": [
+            "(@objecttype==\"Product\")([[@ec_item_group_id]($query) ($originalQuery)($facetsFilter)])"
+          ]
+        },
+        "condition": {
+          "id": "2ff77b4b-c91a-4666-84a2-4a4af2a9b650",
+          "definition": "when $context [disabled] is disabled",
+          "detailed": {
+            "condition": {
+              "operator": "is",
+              "left": {
+                "object": "context",
+                "key": "disabled"
+              },
+              "right": "disabled"
+            }
+          },
+          "feature": "when",
+          "condition": null,
+          "clean_definition": "($context['disabled']==\"disabled\")"
+        }
+      },
+      {
+        "id": "96f8ac2e-b6b5-4c3e-b4cd-2d02196133fd",
+        "feature": "filter",
+        "definition": "filter dq `(@objecttype==Product)([[@ec_item_group_id]($query) ($originalQuery)($facetsFilter)])`",
+        "detailed": {
+          "expressions": [
+            "(@objecttype==\"Product\")([[@ec_item_group_id]($query) ($originalQuery)($facetsFilter)])"
+          ]
+        },
+        "condition": {
+          "id": "2ff77b4b-c91a-4666-84a2-4a4af2a9b650",
+          "definition": "when $context [disabled] is disabled",
+          "detailed": {
+            "condition": {
+              "operator": "is",
+              "left": {
+                "object": "context",
+                "key": "disabled"
+              },
+              "right": "disabled"
+            }
+          },
+          "feature": "when",
+          "condition": null,
+          "clean_definition": "($context['disabled']==\"disabled\")"
+        }
+      },
+      {
+        "id": "96f8ac2e-b6b5-4c3e-b4cd-2d02196133fd",
+        "feature": "filter",
+        "definition": "filter dq `(@objecttype==Product)([[@ec_item_group_id]($query) ($originalQuery)($facetsFilter)])`",
+        "detailed": {
+          "expressions": [
+            "(@objecttype==\"Product\")([[@ec_item_group_id]($query) ($originalQuery)($facetsFilter)])"
+          ]
+        },
+        "condition": {
+          "id": "2ff77b4b-c91a-4666-84a2-4a4af2a9b650",
+          "definition": "when $context [disabled] is disabled",
+          "detailed": {
+            "condition": {
+              "operator": "is",
+              "left": {
+                "object": "context",
+                "key": "disabled"
+              },
+              "right": "disabled"
+            }
+          },
+          "feature": "when",
+          "condition": null,
+          "clean_definition": "($context['disabled']==\"disabled\")"
+        }
+      },
+      {
+        "id": "96f8ac2e-b6b5-4c3e-b4cd-2d02196133fd",
+        "feature": "filter",
+        "definition": "filter dq `(@objecttype==Product)([[@ec_item_group_id]($query) ($originalQuery)($facetsFilter)])`",
+        "detailed": {
+          "expressions": [
+            "(@objecttype==\"Product\")([[@ec_item_group_id]($query) ($originalQuery)($facetsFilter)])"
+          ]
+        },
+        "condition": {
+          "id": "2ff77b4b-c91a-4666-84a2-4a4af2a9b650",
+          "definition": "when $context [disabled] is disabled",
+          "detailed": {
+            "condition": {
+              "operator": "is",
+              "left": {
+                "object": "context",
+                "key": "disabled"
+              },
+              "right": "disabled"
+            }
+          },
+          "feature": "when",
+          "condition": null,
+          "clean_definition": "($context['disabled']==\"disabled\")"
+        }
+      },
+      {
+        "id": "96f8ac2e-b6b5-4c3e-b4cd-2d02196133fd",
+        "feature": "filter",
+        "definition": "filter dq `(@objecttype==Product)([[@ec_item_group_id]($query) ($originalQuery)($facetsFilter)])`",
+        "detailed": {
+          "expressions": [
+            "(@objecttype==\"Product\")([[@ec_item_group_id]($query) ($originalQuery)($facetsFilter)])"
+          ]
+        },
+        "condition": {
+          "id": "2ff77b4b-c91a-4666-84a2-4a4af2a9b650",
+          "definition": "when $context [disabled] is disabled",
+          "detailed": {
+            "condition": {
+              "operator": "is",
+              "left": {
+                "object": "context",
+                "key": "disabled"
+              },
+              "right": "disabled"
+            }
+          },
+          "feature": "when",
+          "condition": null,
+          "clean_definition": "($context['disabled']==\"disabled\")"
+        }
+      }
+    ]
+  },
+  {
+    "id": "d9b3f900-318c-46ce-8f25-f3fb9c62e337",
+    "name": "PDP",
+    "condition": null,
+    "statements": [
+      {
+        "id": "ebff1bb4-f7d5-4415-829b-f17f6c885a32",
+        "feature": "queryParamOverride",
+        "definition": "override query filterField:ec_item_group_id",
+        "detailed": {
+          "filterField": "ec_item_group_id"
+        },
+        "condition": null
+      },
+      {
+        "id": "ebff1bb4-f7d5-4415-829b-f17f6c885a32",
+        "feature": "queryParamOverride",
+        "definition": "override query filterField:ec_item_group_id",
+        "detailed": {
+          "filterField": "ec_item_group_id"
+        },
+        "condition": null
+      },
+      {
+        "id": "ebff1bb4-f7d5-4415-829b-f17f6c885a32",
+        "feature": "queryParamOverride",
+        "definition": "override query filterField:ec_item_group_id",
+        "detailed": {
+          "filterField": "ec_item_group_id"
+        },
+        "condition": null
+      }
+    ]
+  },
+  {
+    "id": "24ebd9db-15ca-4317-a21d-b25def48e357",
+    "name": "Recommendations",
+    "condition": {
+      "id": "122521ce-eb11-46ad-a50d-9c5fb276ee7a",
+      "definition": "when $searchHub contains \"REC - \"",
+      "detailed": {
+        "condition": {
+          "operator": "contains",
+          "left": {
+            "object": "searchHub"
+          },
+          "right": "REC - "
+        }
+      },
+      "feature": "when",
+      "condition": null,
+      "clean_definition": "($searchHub.indexOf(\"REC - \")!=-1) "
+    },
+    "statements": [
+      {
+        "id": "397461dc-863c-478d-801f-38c140072e84",
+        "feature": "filter",
+        "definition": "filter cq `@objectType==Product`",
+        "detailed": {
+          "expressions": ["@objectType==Product"]
+        },
+        "condition": null
+      }
+    ]
+  }
+]
