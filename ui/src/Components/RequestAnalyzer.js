@@ -20,7 +20,7 @@ export default function RequestAnalyzer() {
   const checkQueryField = (condition) => {
     let fieldFound = false;
     let result = false;
-    Object.entries(state.request?.data).forEach(([key, value]) => {
+    Object.entries(state.request ?.data).forEach(([key, value]) => {
       let fieldValue = `\\$${key}`;
       const regex = new RegExp(fieldValue);
       //Check if fieldValue is within condition
@@ -46,6 +46,17 @@ export default function RequestAnalyzer() {
 
   const checkCondition = (condition) => {
     //Checks if condition is met by the query
+    if (condition) {
+      let conditionToCheck = condition.clean_definition;
+      if (conditionToCheck !== "") {
+        let result = checkQueryField(conditionToCheck);
+        return result ? "Yes" : "No";
+      }
+    } else return "No condition set";
+  };
+
+  const checkInExecReport = (condition) => {
+    //Checks if condition inside execution report
     if (condition) {
       let conditionToCheck = condition.clean_definition;
       if (conditionToCheck !== "") {
@@ -92,8 +103,9 @@ export default function RequestAnalyzer() {
   };
 
   let parameters = null;
-  if (state.request?.data) {
-    parameters = Object.entries(state.request?.data).map(([key, value]) => {
+  let finalAnalysis = {};
+  if (state.request ?.data) {
+    parameters = Object.entries(state.request ?.data).map(([key, value]) => {
       return <TextField
         id={'tf--' + key}
         key={'tf--' + key}
@@ -106,6 +118,7 @@ export default function RequestAnalyzer() {
   let pipelineReport = null;
   //console.log(state.pipelines);
   let pipelineSelected = false;
+  let pipelineName = '';
   if (state.pipelines.length > 0) {
     console.log("Render pipelines");
     pipelineReport = state.pipelines.map((row, idx) => {
@@ -117,6 +130,7 @@ export default function RequestAnalyzer() {
         if (valid === "Yes") {
           if (pipelineSelected === false) {
             pipelineSelected = true;
+            pipelineName = row.name;
             conditionUsed = "Yes";
             state.pipelines[idx]['used'] = true;
           }
@@ -129,8 +143,8 @@ export default function RequestAnalyzer() {
           <TableCell scope="row">
             {row.name}
           </TableCell>
-          <TableCell align="left">{row.condition?.definition}</TableCell>
-          <TableCell align="left">{row.condition?.clean_definition}</TableCell>
+          <TableCell align="left">{row.condition ?.definition}</TableCell>
+          <TableCell align="left">{row.condition ?.clean_definition}</TableCell>
           <TableCell align="right">{valid}</TableCell>
           <TableCell align="right">{conditionUsed}</TableCell>
         </TableRow>;
@@ -150,6 +164,7 @@ export default function RequestAnalyzer() {
           let conditionUsed = "Yes";
           state.pipelines[idx]['used'] = true;
           state.pipelines[idx]['valid'] = false;
+          pipelineName = row.name;
           if (valid === "Yes") {
             state.pipelines[idx]['valid'] = true;
           }
@@ -160,8 +175,8 @@ export default function RequestAnalyzer() {
             <TableCell scope="row">
               {row.name}
             </TableCell>
-            <TableCell align="left">{row.condition?.definition}</TableCell>
-            <TableCell align="left">{row.condition?.clean_definition}</TableCell>
+            <TableCell align="left">{row.condition ?.definition}</TableCell>
+            <TableCell align="left">{row.condition ?.clean_definition}</TableCell>
             <TableCell align="right">{valid}</TableCell>
             <TableCell align="right">{conditionUsed}</TableCell>
           </TableRow>;
@@ -171,6 +186,10 @@ export default function RequestAnalyzer() {
     }
   }
   console.log(pipelineReportDefault);
+
+  //Add pipeline final analysis
+  //finalAnalysis['Pipeline Validation']=state.request?.data['pipeline']==pipelineName;
+
 
   let pipelineReportDetails = null;
   //continue with the pipeline analysis
@@ -184,6 +203,7 @@ export default function RequestAnalyzer() {
           let conditionUsed = "No";
           state.pipelines[idx].statements[idxs]['valid'] = false;
           state.pipelines[idx].statements[idxs]['used'] = false;
+          state.pipelines[idx].statements[idxs]['inExecutionReport'] = checkInExecReport(statement.condition);
           if (valid === "Yes") {
             state.pipelines[idx].statements[idxs]['valid'] = true;
             state.pipelines[idx].statements[idxs]['used'] = true;
@@ -202,8 +222,8 @@ export default function RequestAnalyzer() {
             <TableCell scope="row">
               {statement.feature} - {statement.definition}
             </TableCell>
-            <TableCell align="left">{statement.condition?.definition}</TableCell>
-            <TableCell align="left">{statement.condition?.clean_definition}</TableCell>
+            <TableCell align="left">{statement.condition ?.definition}</TableCell>
+            <TableCell align="left">{statement.condition ?.clean_definition}</TableCell>
             <TableCell align="right">{valid}</TableCell>
             <TableCell align="right">{conditionUsed}</TableCell>
           </TableRow>;
@@ -215,8 +235,8 @@ export default function RequestAnalyzer() {
   }
   let executionReport = null;
   //console.log(state.response, window.STATE.response);
-  if (state.response?.executionReport) {
-    executionReport = state.response?.executionReport.children.map((row, idx) => {
+  if (state.response ?.executionReport) {
+    executionReport = state.response ?.executionReport.children.map((row, idx) => {
       return <TableRow key={row.name}>
         <TableCell scope="row">
           {idx}
@@ -246,22 +266,22 @@ export default function RequestAnalyzer() {
         <DialogContent>
           <Button variant="contained" onClick={analyzeRequest}>Analyze</Button>
           <h3>
-            Parameters:{state.request?.data && <span>{state.request?.data.length}</span>}
+            Parameters:{state.request ?.data && <span>{state.request ?.data.length}</span>}
           </h3>
           <div>
             {parameters}
           </div>
           <h3>Pipeline Report</h3>
           {pipelineReport && <TableContainer component={Paper}>
-            <Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
+            <Table sx={{ minWidth: 650, maxWidth: 850, wordBreak:'break-word',overflowWrap: 'break-word' }} size="small" aria-label="a dense table">
               <TableHead>
                 <TableRow>
-                  <TableCell></TableCell>
-                  <TableCell>Name</TableCell>
+                  <TableCell style={{ width: 50 }}></TableCell>
+                  <TableCell style={{ width: 200 }}>Name</TableCell>
                   <TableCell>Condition</TableCell>
                   <TableCell>Check Condition</TableCell>
-                  <TableCell>Meets Query</TableCell>
-                  <TableCell>Used</TableCell>
+                  <TableCell style={{ width: 100 }}>Meets Query</TableCell>
+                  <TableCell style={{ width: 50 }}>Used</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -272,15 +292,15 @@ export default function RequestAnalyzer() {
           </TableContainer>}
           <h3>Selected Pipeline Report</h3>
           {pipelineReportDetails && <TableContainer component={Paper}>
-            <Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
+            <Table sx={{ minWidth: 650, maxWidth: 850, wordBreak:'break-word',overflowWrap: 'break-word' }} size="small" aria-label="a dense table">
               <TableHead>
                 <TableRow>
-                  <TableCell></TableCell>
-                  <TableCell>Name</TableCell>
+                  <TableCell style={{ width: 50 }}></TableCell>
+                  <TableCell style={{ width: 200 }}>Name</TableCell>
                   <TableCell>Condition</TableCell>
                   <TableCell>Check Condition</TableCell>
-                  <TableCell>Meets Query</TableCell>
-                  <TableCell>Used</TableCell>
+                  <TableCell style={{ width: 50 }}>Meets Query</TableCell>
+                  <TableCell style={{ width: 50 }}>Used</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
