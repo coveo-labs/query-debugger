@@ -1,5 +1,5 @@
 
-const FIELDS_FROM_PIPELINE = ['id', 'isDefault','name', 'condition', 'statements'];
+const FIELDS_FROM_PIPELINE = ['id', 'isDefault', 'name', 'condition', 'statements'];
 const FIELDS_FROM_STATEMENTS = ['id', 'feature', 'definition', 'condition', 'detailed'];
 
 const SCRIPT_TRANSLATORS = [
@@ -80,6 +80,8 @@ class Pipelines {
 
   cleanScript(condition) {
     condition = condition + ' ';
+    condition = condition.replaceAll('(', '( ');
+    condition = condition.replaceAll(')', ' )');
     SCRIPT_TRANSLATORS.map(script => {
       condition = condition.replace(script.from, script.to);
     });

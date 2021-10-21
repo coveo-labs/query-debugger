@@ -18,14 +18,18 @@ const curlHelper = {
       // no-op
       //console.warn('Parse error: ', e);
     }
-
     return json;
   },
 
   sendRequest: async (request) => {
     const r = { ...request }; // copy it to put back 'data' as a JSON string
-    r.body = JSON.stringify(r.data);
+    const params = new URLSearchParams();
+    delete r.data.language;
+    Object.keys(r.data).map(key => {
+      params.append(key,r.data[key]);
+    });
 
+    r.body = params;
     const url = r.raw_url;
     r.headers = {
       authorization: r.headers.authorization,
