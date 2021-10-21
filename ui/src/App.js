@@ -25,30 +25,12 @@ const App = () => {
         };
       } else if (selectedPipelineData.length > 0) {
         if (selectedPipelineData.some(e => e.feature === el.value)) {
-          el.style = {
-            backgroundColor: 'rgb(0, 173, 255)',
-            color: 'white',
-            height: '35px',
-            fontSize: '16px',
-            borderColor: 'black',
-          };
+          el.className = 'node-highlight';
         } else {
-          el.style = {
-            backgroundColor: '#ededed',
-            color: '#333333',
-            height: '35px',
-            fontSize: '16px',
-            borderColor: 'black',
-          };
+          el.className = 'node-default';
         }
       } else {
-        el.style = {
-          backgroundColor: '#ededed',
-          color: '#333333',
-          height: '35px',
-          fontSize: '16px',
-          borderColor: 'black',
-        };
+        el.className = 'node-default';
       }
       return el;
     });
