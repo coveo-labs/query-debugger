@@ -2,27 +2,26 @@ import React, { useEffect, useState } from 'react';
 import './App.css';
 import ReactFlow from 'react-flow-renderer';
 import { FormControl, InputLabel, MenuItem, Grid, Select } from '@mui/material';
-import pipelineData from './utils/pipelines.json';
+import pipelineData from './data/pipelines.json';
 import initialElements from './utils/elements';
 import Details from './Components/Details';
 
 
 const App = () => {
   const [elements, setElements] = useState(initialElements);
-  const [queryPipeline, setqueryPipeline] = useState('Select Query Pipeline');
-  const [selectedPipelineData, setSelectedPipelineData] =
-    useState(pipelineData.find(data => data.name === queryPipeline)?.statements ?? []);
+  const [queryPipeline, setqueryPipeline] = useState('');
+  const [selectedPipelineData, setSelectedPipelineData] = useState(pipelineData.find(data => data.name === queryPipeline)?.statements ?? []);
 
   useEffect(() => {
     const updateElement = initialElements;
     updateElement.map((el) => {
-      if (el.id === '1') {
+      if (el.id === 'start') {
         el = { ...el };
       }
-      if (el.id === '2') {
+      if (el.id === 'pipeline') {
         el.data = {
           ...el.data,
-          label: queryPipeline,
+          label: queryPipeline ? 'Pipeline:\n' + queryPipeline : 'Select a Query Pipeline',
         };
       } else if (selectedPipelineData.length > 0) {
         if (selectedPipelineData.some(e => e.feature === el.value)) {
@@ -54,7 +53,7 @@ const App = () => {
       return el;
     });
     setElements([...updateElement]);
-  }, [selectedPipelineData]);
+  }, [selectedPipelineData, queryPipeline]);
 
   const onPipelineSelect = (event) => {
     setqueryPipeline(event.target.value);

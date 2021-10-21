@@ -2,7 +2,7 @@ import { FEATURE_TYPES } from "./constants";
 
 const elements = [
   {
-    id: '1',
+    id: 'start',
     type: 'input',
     data: { label: 'Parse Query' },
     position: { x: 50, y: 50 },
@@ -16,7 +16,7 @@ const elements = [
   },
 
   {
-    id: '2',
+    id: 'pipeline',
     type: 'default',
     data: { label: 'Select Query Pipeline' },
     targetPosition: 'left',
@@ -30,7 +30,7 @@ const elements = [
     }
   },
   {
-    id: '3',
+    id: 'queryParameters',
     type: 'default',
     data: { label: 'Apply Query Parameters' },
     value: FEATURE_TYPES.QUERY_PARAM_OVERRIDE,
@@ -45,7 +45,7 @@ const elements = [
     }
   },
   {
-    id: '4',
+    id: 'thesaurus',
     type: 'default',
     data: { label: 'Apply Thesaurus rules' },
     value: FEATURE_TYPES.THESAURUS,
@@ -60,7 +60,7 @@ const elements = [
     }
   },
   {
-    id: '5',
+    id: 'stopWords',
     type: 'default',
     data: { label: 'Apply Stop words' },
     value: FEATURE_TYPES.STOP_WORD,
@@ -75,7 +75,7 @@ const elements = [
     }
   },
   {
-    id: '6',
+    id: 'filters',
     type: 'default',
     data: { label: 'Apply Filters rules' },
     value: FEATURE_TYPES.FILTER,
@@ -90,7 +90,7 @@ const elements = [
     }
   },
   {
-    id: '7',
+    id: 'qre',
     type: 'default',
     data: { label: 'Query ranking expressions' },
     value: FEATURE_TYPES.RANKING,
@@ -105,7 +105,7 @@ const elements = [
     }
   },
   {
-    id: '8',
+    id: 'featuredResults',
     type: 'default',
     data: { label: 'Apply Featured results' },
     targetPosition: 'right',
@@ -119,7 +119,7 @@ const elements = [
     }
   },
   {
-    id: '9',
+    id: 'rankingWeights',
     type: 'default',
     data: { label: 'Apply Ranking weight' },
     value: FEATURE_TYPES.RANKING_WEIGHT,
@@ -134,7 +134,7 @@ const elements = [
     }
   },
   {
-    id: '10',
+    id: 'mlRecommendations',
     type: 'default',
     data: { label: 'Apply ML Event Recommendations' },
     targetPosition: 'left',
@@ -148,7 +148,7 @@ const elements = [
     }
   },
   {
-    id: '11',
+    id: 'mlART',
     type: 'default',
     data: { label: 'Apply ML ART' },
     targetPosition: 'left',
@@ -162,7 +162,7 @@ const elements = [
     }
   },
   {
-    id: '12',
+    id: 'mlDNE',
     type: 'default',
     data: { label: 'Apply ML DNE' },
     targetPosition: 'left',
@@ -176,7 +176,7 @@ const elements = [
     }
   },
   {
-    id: '13',
+    id: 'queryIndex',
     type: 'default',
     data: { label: 'send query to index' },
     targetPosition: 'top',
@@ -189,7 +189,7 @@ const elements = [
       fontSize: '16px'
     }
   }, {
-    id: '14',
+    id: 'triggers',
     type: 'output',
     data: { label: 'Apply trigger rules' },
     targetPosition: 'right',
@@ -203,19 +203,19 @@ const elements = [
     }
   },
 
-  { id: 'e1-2', source: '1', target: '2', type: 'straight' },
-  { id: 'e2-3', source: '2', target: '3', type: 'straight' },
-  { id: 'e3-4', source: '3', target: '4', type: 'straight' },
-  { id: 'e4-5', source: '4', target: '5', type: 'straight' },
-  { id: 'e5-6', source: '5', target: '6', type: 'straight' },
-  { id: 'e6-7', source: '6', target: '7', type: 'straight' },
-  { id: 'e7-8', source: '7', target: '8', type: 'straight' },
-  { id: 'e8-9', source: '8', target: '9', type: 'straight' },
-  { id: 'e9-10', source: '9', target: '10', type: 'straight' },
-  { id: 'e10-11', source: '10', target: '11', type: 'straight' },
-  { id: 'e11-12', source: '11', target: '12', type: 'straight' },
-  { id: 'e12-13', source: '12', target: '13', type: 'straight' },
-  { id: 'e13-14', source: '13', target: '14', type: 'straight' },
+  { id: 'e1-2', source: 'start', target: 'pipeline', type: 'straight' },
+  { id: 'e2-3', source: 'pipeline', target: 'queryParameters', type: 'straight' },
+  { id: 'e3-4', source: 'queryParameters', target: 'thesaurus', type: 'straight' },
+  { id: 'e4-5', source: 'thesaurus', target: 'stopWords', type: 'straight' },
+  { id: 'e5-6', source: 'stopWords', target: 'filters', type: 'straight' },
+  { id: 'e6-7', source: 'filters', target: 'qre', type: 'straight' },
+  { id: 'e7-8', source: 'qre', target: 'featuredResults', type: 'straight' },
+  { id: 'e8-9', source: 'featuredResults', target: 'rankingWeights', type: 'straight' },
+  { id: 'e9-10', source: 'rankingWeights', target: 'mlRecommendations', type: 'straight' },
+  { id: 'e10-11', source: 'mlRecommendations', target: 'mlART', type: 'straight' },
+  { id: 'e11-12', source: 'mlART', target: 'mlDNE', type: 'straight' },
+  { id: 'e12-13', source: 'mlDNE', target: 'queryIndex', type: 'straight' },
+  { id: 'e13-14', source: 'queryIndex', target: 'triggers', type: 'straight' },
 
 
 ];
