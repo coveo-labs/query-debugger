@@ -1,0 +1,15 @@
+.node-default,
+.node-highlight {
+  height: 35px;
+  font-size: 16px;
+  border-color: black;
+}
+.node-default {
+  background-color: #ededed;
+  color: #333333;
+}
+
+.node-highlight {
+  background-color: rgb(0, 173, 255);
+  color: white;
+}

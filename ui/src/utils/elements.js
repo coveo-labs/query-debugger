@@ -1,5 +1,7 @@
 import { FEATURE_TYPES } from "./constants";
 
+import './elements.css';
+
 const elements = [
   {
     id: 'start',
@@ -7,12 +9,7 @@ const elements = [
     data: { label: 'Parse Query' },
     position: { x: 50, y: 50 },
     sourcePosition: 'right',
-    style: {
-      backgroundColor: 'rgb(0, 173, 255)',
-      color: 'white',
-      height: '35px',
-      fontSize: '16px'
-    }
+    className: 'node-highlight',
   },
 
   {
@@ -22,12 +19,7 @@ const elements = [
     targetPosition: 'left',
     sourcePosition: 'right',
     position: { x: 300, y: 50 },
-    style: {
-      backgroundColor: 'rgb(0, 173, 255)',
-      color: 'white',
-      height: '35px',
-      fontSize: '16px'
-    }
+    className: 'node-highlight',
   },
   {
     id: 'queryParameters',
@@ -37,12 +29,7 @@ const elements = [
     targetPosition: 'left',
     sourcePosition: 'right',
     position: { x: 550, y: 50 },
-    style: {
-      backgroundColor: '#ededed',
-      color: '#333333',
-      height: '35px',
-      fontSize: '16px'
-    }
+    className: 'node-default',
   },
   {
     id: 'thesaurus',
@@ -52,12 +39,7 @@ const elements = [
     targetPosition: 'left',
     sourcePosition: 'bottom',
     position: { x: 800, y: 50 },
-    style: {
-      backgroundColor: '#ededed',
-      color: '#333333',
-      height: '35px',
-      fontSize: '16px'
-    }
+    className: 'node-default',
   },
   {
     id: 'stopWords',
@@ -67,12 +49,7 @@ const elements = [
     targetPosition: 'top',
     sourcePosition: 'left',
     position: { x: 800, y: 150 },
-    style: {
-      backgroundColor: '#ededed',
-      color: '#333333',
-      height: '35px',
-      fontSize: '16px'
-    }
+    className: 'node-default',
   },
   {
     id: 'filters',
@@ -82,12 +59,7 @@ const elements = [
     targetPosition: 'right',
     sourcePosition: 'left',
     position: { x: 550, y: 150 },
-    style: {
-      backgroundColor: '#ededed',
-      color: '#333333',
-      height: '35px',
-      fontSize: '16px'
-    }
+    className: 'node-default',
   },
   {
     id: 'qre',
@@ -97,12 +69,7 @@ const elements = [
     targetPosition: 'right',
     sourcePosition: 'left',
     position: { x: 300, y: 150 },
-    style: {
-      backgroundColor: '#ededed',
-      color: '#333333',
-      height: '35px',
-      fontSize: '16px'
-    }
+    className: 'node-default',
   },
   {
     id: 'featuredResults',
@@ -111,12 +78,7 @@ const elements = [
     targetPosition: 'right',
     sourcePosition: 'bottom',
     position: { x: 50, y: 150 },
-    style: {
-      backgroundColor: '#ededed',
-      color: '#333333',
-      height: '35px',
-      fontSize: '16px'
-    }
+    className: 'node-default',
   },
   {
     id: 'rankingWeights',
@@ -126,12 +88,7 @@ const elements = [
     targetPosition: 'top',
     sourcePosition: 'right',
     position: { x: 50, y: 250 },
-    style: {
-      backgroundColor: '#ededed',
-      color: '#333333',
-      height: '35px',
-      fontSize: '16px'
-    }
+    className: 'node-default',
   },
   {
     id: 'mlRecommendations',
@@ -140,12 +97,7 @@ const elements = [
     targetPosition: 'left',
     sourcePosition: 'right',
     position: { x: 300, y: 250 },
-    style: {
-      backgroundColor: '#ededed',
-      color: '#333333',
-      height: '35px',
-      fontSize: '16px'
-    }
+    className: 'node-default',
   },
   {
     id: 'mlART',
@@ -154,12 +106,7 @@ const elements = [
     targetPosition: 'left',
     sourcePosition: 'right',
     position: { x: 550, y: 250 },
-    style: {
-      backgroundColor: '#ededed',
-      color: '#333333',
-      height: '35px',
-      fontSize: '16px'
-    }
+    className: 'node-default',
   },
   {
     id: 'mlDNE',
@@ -168,12 +115,7 @@ const elements = [
     targetPosition: 'left',
     sourcePosition: 'bottom',
     position: { x: 800, y: 250 },
-    style: {
-      backgroundColor: '#ededed',
-      color: '#333333',
-      height: '35px',
-      fontSize: '16px'
-    }
+    className: 'node-default',
   },
   {
     id: 'queryIndex',
@@ -182,25 +124,14 @@ const elements = [
     targetPosition: 'top',
     sourcePosition: 'left',
     position: { x: 800, y: 350 },
-    style: {
-      backgroundColor: '#ededed',
-      color: '#333333',
-      height: '35px',
-      fontSize: '16px'
-    }
+    className: 'node-default',
   }, {
     id: 'triggers',
     type: 'output',
     data: { label: 'Apply trigger rules' },
     targetPosition: 'right',
     position: { x: 550, y: 350 },
-    style: {
-      backgroundColor: '#ededed',
-      color: '#333333',
-      borderColor: 'black',
-      height: '35px',
-      fontSize: '16px'
-    }
+    className: 'node-default',
   },
 
   { id: 'e1-2', source: 'start', target: 'pipeline', type: 'straight' },
