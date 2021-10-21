@@ -46,6 +46,7 @@ const App = () => {
     setQueryPipeline(event.target.value);
     setSelectedPipelineData(pipelineData.find(data =>
       data.name === event.target.value).statements);
+    setFeatureData([]);
   };
 
   const onElementClick = (event, element) => {

@@ -13,12 +13,23 @@ const Details = (props) => {
     setExpanded(isExpanded ? index : false);
   };
 
-  const selectLabel = (fData) => {
-    if (fData.definition) {
-      return fData.definition;
+  // const selectLabel = (fData) => {
+  //   if (fData.definition) {
+  //     return fData.definition;
+  //   }
+  //   return fData.label;
+  // };
+  const selectLabel = (label) => {
+    switch (label) {
+      case 'rankingweight':
+        return label = 'Ranking Weight';
+      case 'queryParamOverride':
+        return label = 'Query Parameters';
+      default:
+        return label;
     }
-    return fData.label;
   };
+
 
   return (
     <div style={{ height: '280px', margin: '2%', marginBottom: '2%' }}>
