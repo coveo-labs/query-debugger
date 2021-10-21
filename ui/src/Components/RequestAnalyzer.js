@@ -22,18 +22,7 @@ export default function RequestAnalyzer() {
     }
     const req = curlHelper.parseCurl(cURL);
 
-    // =======================================
-    // CANNOT DO REQUESTS BECAUSE OF CORS - using a sample
-    //
-    // const res = await curlHelper.sendRequest(req);
-    // =======================================
-    let res = {};
-    try {
-      res = JSON.parse(window.STATE.response);
-    }
-    catch (e) {
-      console.log(e);
-    }
+    const res = await curlHelper.sendRequest(req);
     setState({ request: req, response: res });
   };
 

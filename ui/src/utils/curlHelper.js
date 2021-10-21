@@ -12,7 +12,6 @@ const curlHelper = {
 
     try {
       const data = Object.keys(json.data)[0];
-      console.log(data);
       json.data = JSON.parse(data);
     }
     catch (e) {
@@ -26,9 +25,17 @@ const curlHelper = {
   sendRequest: async (request) => {
     const r = { ...request }; // copy it to put back 'data' as a JSON string
     r.body = JSON.stringify(r.data);
-    r.mode = 'no-cors';
-    const response = await fetch(r.raw_url, r);
+
+    const url = r.raw_url;
+    r.headers = {
+      authorization: r.headers.authorization,
+      'content-type': r.headers['content-type'],
+    };
+    r.method = 'POST';
+
+    const response = await fetch(url, r);
     const data = await response.json();
+
     return data;
   },
 };
