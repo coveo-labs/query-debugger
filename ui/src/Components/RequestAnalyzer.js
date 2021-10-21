@@ -10,7 +10,7 @@ const REQUEST_TRANSLATORS = [
   { from: 'aq', to: 'advancedQuery' },
   { from: 'dq', to: 'disjunctionQuery' }
 ];
-export default function RequestAnalyzer() {
+export default function RequestAnalyzer(props) {
   const [open, setOpen] = React.useState(false);
   const [state, setState] = React.useState({ request: {}, response: {}, pipelines: [] });
 
@@ -231,7 +231,7 @@ export default function RequestAnalyzer() {
       }
     });
 
-    window.STATE.pipelines = state.pipelines;
+    props.setPipelines(state.pipelines);
   }
   let executionReport = null;
   //console.log(state.response, window.STATE.response);
