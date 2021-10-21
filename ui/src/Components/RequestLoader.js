@@ -20,7 +20,7 @@ export default function RequestLoader() {
   };
 
   const loadSample = (name) => {
-    const req = Buffer.from(curlSamples[name + '__request'], 'base64').toString();
+    const req = Buffer.from(curlSamples[name + '__curl'], 'base64').toString();
     const res = Buffer.from(curlSamples[name + '__response'], 'base64').toString();
     const pipelines = Buffer.from(curlSamples[name + '__pipelines'], 'base64').toString();
     //window.STATE.curl = req;
