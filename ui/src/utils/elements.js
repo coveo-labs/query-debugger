@@ -24,8 +24,7 @@ const elements = [
   {
     id: 'queryParameters',
     type: 'default',
-    data: { label: 'Apply Query Parameters' },
-    value: FEATURE_TYPES.QUERY_PARAM_OVERRIDE,
+    data: { label: 'Apply Query Parameters', value: FEATURE_TYPES.QUERY_PARAM_OVERRIDE, },
     targetPosition: 'left',
     sourcePosition: 'right',
     position: { x: 550, y: 50 },
@@ -34,8 +33,7 @@ const elements = [
   {
     id: 'thesaurus',
     type: 'default',
-    data: { label: 'Apply Thesaurus rules' },
-    value: FEATURE_TYPES.THESAURUS,
+    data: { label: 'Apply Thesaurus rules', value: FEATURE_TYPES.THESAURUS, },
     targetPosition: 'left',
     sourcePosition: 'bottom',
     position: { x: 800, y: 50 },
@@ -44,8 +42,7 @@ const elements = [
   {
     id: 'stopWords',
     type: 'default',
-    data: { label: 'Apply Stop words' },
-    value: FEATURE_TYPES.STOP_WORD,
+    data: { label: 'Apply Stop words', value: FEATURE_TYPES.STOP_WORD, },
     targetPosition: 'top',
     sourcePosition: 'left',
     position: { x: 800, y: 150 },
@@ -54,8 +51,7 @@ const elements = [
   {
     id: 'filters',
     type: 'default',
-    data: { label: 'Apply Filters rules' },
-    value: FEATURE_TYPES.FILTER,
+    data: { label: 'Apply Filters rules', value: FEATURE_TYPES.FILTER, },
     targetPosition: 'right',
     sourcePosition: 'left',
     position: { x: 550, y: 150 },
@@ -64,8 +60,7 @@ const elements = [
   {
     id: 'qre',
     type: 'default',
-    data: { label: 'Query ranking expressions' },
-    value: FEATURE_TYPES.RANKING,
+    data: { label: 'Query ranking expressions', value: FEATURE_TYPES.RANKING, },
     targetPosition: 'right',
     sourcePosition: 'left',
     position: { x: 300, y: 150 },
@@ -83,8 +78,7 @@ const elements = [
   {
     id: 'rankingWeights',
     type: 'default',
-    data: { label: 'Apply Ranking weight' },
-    value: FEATURE_TYPES.RANKING_WEIGHT,
+    data: { label: 'Apply Ranking weight', value: FEATURE_TYPES.RANKING_WEIGHT, },
     targetPosition: 'top',
     sourcePosition: 'right',
     position: { x: 50, y: 250 },
