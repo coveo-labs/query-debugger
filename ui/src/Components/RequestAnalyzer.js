@@ -76,9 +76,9 @@ export default function RequestAnalyzer() {
 
     let req = curlHelper.parseCurl(cURL);
     req = addRequestTranslators(req);
-    console.log(req);
 
     const response = await curlHelper.sendRequest(req);
+    console.log(response);
 
     let pipelines = [];
     try {
