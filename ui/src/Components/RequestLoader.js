@@ -26,7 +26,7 @@ export default function RequestLoader(props) {
     let environment = Environment.prod;
     let region = Region.US;
 
-    const endpoint = (request.headers ?.authority || '').toLowerCase();
+    const endpoint = (request.headers?.authority || '').toLowerCase();
 
     if (endpoint.startsWith('platformqa')) environment = Environment.staging;
     else if (endpoint.startsWith('platformdev')) environment = Environment.dev;
@@ -35,14 +35,14 @@ export default function RequestLoader(props) {
     if ((/^platform\w*-au/i).test(endpoint)) region = Region.AU;
     else if ((/^platform\w*-eu/i).test(endpoint)) region = Region.EU;
 
-    const bearer = request.headers ?.authorization || '';
+    const bearer = request.headers?.authorization || '';
     let apiKeyOrToken = bearer.replace(/^Bearer\s+/gi, '').trim();
 
-    console.log(request.queries ?.organizationId);
+    console.log(request.queries?.organizationId);
     console.log(apiKeyOrToken);
     return new PlatformClient({
       accessToken: apiKeyOrToken || 'Missing-Token',
-      organizationId: request.queries ?.organizationId,
+      organizationId: request.queries?.organizationId,
       environment,
       region,
     });
@@ -71,7 +71,7 @@ export default function RequestLoader(props) {
         {String(errorMessage)}
       </Typography>
     );
-  }
+  };
 
   const loadSample = (name) => {
     if (name !== 'CURL') {
@@ -94,7 +94,7 @@ export default function RequestLoader(props) {
         console.log('Getting QPLs');
         pipelines.getQPL().then(content => {
           console.log(content);
-          if (content.length == 0) {
+          if (!content.length) {
             setBusy(false);
             setError('Something went wrong, no content could be retrieved. Check the console for error message.');
           } else {

@@ -20,7 +20,7 @@ export default function RequestAnalyzer(props) {
   const checkQueryField = (condition) => {
     let fieldFound = false;
     let result = false;
-    Object.entries(state.request ?.data).forEach(([key, value]) => {
+    Object.entries(state.request?.data).forEach(([key, value]) => {
       let fieldValue = `\\$${key}`;
       const regex = new RegExp(fieldValue);
       //Check if fieldValue is within condition
@@ -30,6 +30,7 @@ export default function RequestAnalyzer(props) {
         try {
           let expression = condition.replaceAll(`$${key}`, value);
           console.log(expression);
+          // eslint-disable-next-line no-eval
           result = eval(expression);
         }
         catch (e) {
@@ -104,8 +105,8 @@ export default function RequestAnalyzer(props) {
 
   let parameters = null;
   let finalAnalysis = {};
-  if (state.request ?.data) {
-    parameters = Object.entries(state.request ?.data).map(([key, value]) => {
+  if (state.request?.data) {
+    parameters = Object.entries(state.request?.data).map(([key, value]) => {
       return <TextField
         id={'tf--' + key}
         key={'tf--' + key}
@@ -144,8 +145,8 @@ export default function RequestAnalyzer(props) {
           <TableCell scope="row">
             {row.name}
           </TableCell>
-          <TableCell align="left">{row.condition ?.definition}</TableCell>
-          <TableCell align="left">{row.condition ?.clean_definition}</TableCell>
+          <TableCell align="left">{row.condition?.definition}</TableCell>
+          <TableCell align="left">{row.condition?.clean_definition}</TableCell>
           <TableCell align="right">{valid}</TableCell>
           <TableCell align="right">{conditionUsed}</TableCell>
         </TableRow>;
@@ -176,8 +177,8 @@ export default function RequestAnalyzer(props) {
             <TableCell scope="row">
               {row.name}
             </TableCell>
-            <TableCell align="left">{row.condition ?.definition}</TableCell>
-            <TableCell align="left">{row.condition ?.clean_definition}</TableCell>
+            <TableCell align="left">{row.condition?.definition}</TableCell>
+            <TableCell align="left">{row.condition?.clean_definition}</TableCell>
             <TableCell align="right">{valid}</TableCell>
             <TableCell align="right">{conditionUsed}</TableCell>
           </TableRow>;
@@ -189,8 +190,7 @@ export default function RequestAnalyzer(props) {
   console.log(pipelineReportDefault);
 
   //Add pipeline final analysis
-  //finalAnalysis['Pipeline Validation']=state.request?.data['pipeline']==pipelineName;
-
+  finalAnalysis['Pipeline Validation'] = state.request?.data['pipeline'] === pipelineName;
 
   let pipelineReportDetails = null;
   //continue with the pipeline analysis
@@ -223,8 +223,8 @@ export default function RequestAnalyzer(props) {
             <TableCell scope="row">
               {statement.feature} - {statement.definition}
             </TableCell>
-            <TableCell align="left">{statement.condition ?.definition}</TableCell>
-            <TableCell align="left">{statement.condition ?.clean_definition}</TableCell>
+            <TableCell align="left">{statement.condition?.definition}</TableCell>
+            <TableCell align="left">{statement.condition?.clean_definition}</TableCell>
             <TableCell align="right">{valid}</TableCell>
             <TableCell align="right">{conditionUsed}</TableCell>
           </TableRow>;
@@ -237,9 +237,9 @@ export default function RequestAnalyzer(props) {
   }
   let executionReport = null;
   //console.log(state.response, window.STATE.response);
-  if (state.response ?.executionReport) {
+  if (state.response?.executionReport) {
     const total = state.response.duration;
-    executionReport = state.response ?.executionReport.children.map((row, idx) => {
+    executionReport = state.response?.executionReport.children.map((row, idx) => {
       return <TableRow key={row.name}>
         <TableCell scope="row">
           {idx}
@@ -269,7 +269,7 @@ export default function RequestAnalyzer(props) {
         <DialogContent>
           <Button variant="contained" onClick={analyzeRequest}>Analyze</Button>
           <h3>
-            Parameters:{state.request ?.data && <span>{state.request ?.data.length}</span>}
+            Parameters:{state.request?.data && <span>{state.request?.data.length}</span>}
           </h3>
           <div>
             {parameters}
