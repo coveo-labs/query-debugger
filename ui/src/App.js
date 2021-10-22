@@ -20,7 +20,7 @@ const App = () => {
   const [featureData, setFeatureData] = useState([]);
   useEffect(() => {
     const updateElement = initialElements;
-    setReport('No of pipelines retrieved: '+pipelineData.length);
+    setReport('No of pipelines retrieved: ', pipelineData?.length, pipelineData);
 
     updateElement.map((el) => {
       if (el.id === 'start') {
@@ -56,13 +56,16 @@ const App = () => {
       data.feature === element.data.value);
     setFeatureData([...featureData]);
   };
+
+  console.log('PD: ', pipelineData, pipelineData?.map);
+
   return (
     <>
       <h1 style={{ textAlign: 'center' }}>Query Debugger</h1>
       <h3 style={{ textAlign: 'center' }}>{String(report)}</h3>
       <div style={{ marginLeft: '1%' }}>
         <RequestLoader setPipelines={setPipelineData} />
-        <RequestAnalyzer setPipelines={setPipelineData} />
+        <RequestAnalyzer pipelineData={pipelineData} setPipelines={setPipelineData} />
       </div>
       <Grid container>
         <Grid item xs={12} md={12} lg={12} style={{ textAlign: 'end', marginRight: '2%' }}>
@@ -75,7 +78,7 @@ const App = () => {
               label="Select Query Pipeline"
               onChange={onPipelineSelect}
             >
-              {pipelineData && pipelineData.map((data) => <MenuItem value={data.name}>{data.name}</MenuItem>)}
+              {pipelineData?.map && pipelineData.map((data) => <MenuItem key={'menu--' + data.name} value={data.name}>{data.name}</MenuItem>)}
             </Select>
           </FormControl>
         </Grid>

@@ -11,6 +11,8 @@ import curlHelper from '../utils/curlHelper';
 import Pipelines from '../utils/Pipelines.js';
 
 export default function RequestLoader(props) {
+  let currentPipelines = [];
+
   const [open, setOpen] = React.useState(false);
   const [error, setError] = React.useState('');
   const [cURL, setcURL] = React.useState('');
@@ -52,7 +54,7 @@ export default function RequestLoader(props) {
     window.STATE.curl = cURL;
     //console.log(window.STATE.pipelines);
     //props.setPipelines(JSON.parse(window.STATE.pipelines));
-    props.setPipelines(window.STATE.pipelines);
+    props.setPipelines(currentPipelines);
     setOpen(false);
   };
 
@@ -76,11 +78,10 @@ export default function RequestLoader(props) {
   const loadSample = (name) => {
     if (name !== 'CURL') {
       const req = Buffer.from(curlSamples[name + '__curl'], 'base64').toString();
-      const res = Buffer.from(curlSamples[name + '__response'], 'base64').toString();
+      // const res = Buffer.from(curlSamples[name + '__response'], 'base64').toString();
       const pipelines = Buffer.from(curlSamples[name + '__pipelines'], 'base64').toString();
-      //window.STATE.curl = req;
-      window.STATE.response = res;
-      window.STATE.pipelines = JSON.parse(pipelines);
+
+      currentPipelines = JSON.parse(pipelines);
       setcURL(req);
     } else {
       //Load it using the apikey and org from curl request
@@ -133,7 +134,7 @@ export default function RequestLoader(props) {
           <div>
             <h3>Samples:</h3>
             <ButtonGroup variant="outlined" aria-label="outlined primary button group">
-              <Button onClick={() => loadSample('dellsandbox')} primary  >Dell Sandbox</Button>
+              <Button onClick={() => loadSample('dellsandbox')}>Dell Sandbox</Button>
               <Button onClick={() => loadSample('fashion')}>Fashion</Button>
             </ButtonGroup>
             <h3>New request:</h3>
