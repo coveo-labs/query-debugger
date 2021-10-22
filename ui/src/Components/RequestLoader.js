@@ -49,10 +49,11 @@ export default function RequestLoader(props) {
   };
 
   const handleSave = () => {
-    window.STATE.curl = cURL;
+    //window.STATE.curl = cURL;
     //console.log(window.STATE.pipelines);
     //props.setPipelines(JSON.parse(window.STATE.pipelines));
-    props.setPipelines(window.STATE.pipelines);
+    //props.setPipelines(window.STATE.pipelines);
+    props.setCurls(cURL);
     setOpen(false);
   };
 
@@ -79,8 +80,9 @@ export default function RequestLoader(props) {
       const res = Buffer.from(curlSamples[name + '__response'], 'base64').toString();
       const pipelines = Buffer.from(curlSamples[name + '__pipelines'], 'base64').toString();
       //window.STATE.curl = req;
-      window.STATE.response = res;
-      window.STATE.pipelines = JSON.parse(pipelines);
+      //window.STATE.response = res;
+      //window.STATE.pipelines = JSON.parse(pipelines);
+      props.setPipelines(JSON.parse(pipelines));
       setcURL(req);
     } else {
       //Load it using the apikey and org from curl request
@@ -98,7 +100,9 @@ export default function RequestLoader(props) {
             setBusy(false);
             setError('Something went wrong, no content could be retrieved. Check the console for error message.');
           } else {
-            window.STATE.pipelines = content;
+            //window.STATE.pipelines = content;
+            props.setPipelines(content);
+            //console.log(window.STATE.pipelines);
             //setcURL(req);
             setBusy(false);
             handleSave();

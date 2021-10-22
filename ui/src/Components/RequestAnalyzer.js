@@ -17,7 +17,9 @@ export default function RequestAnalyzer(props) {
   const [jsonT, setJSONT] = React.useState({});
   const [state, setState] = React.useState({ request: {}, response: {}, pipelines: [] });
 
-  const handleClickOpen = () => { setOpen(true); };
+  const handleClickOpen = () => { 
+    setState({ request: {}, response: {}, pipelines: [] });
+    setOpen(true); };
   const handleClose = () => { setOpen(false); };
   useEffect(() => {
     setJSON(jsonT);
@@ -117,7 +119,7 @@ export default function RequestAnalyzer(props) {
   };
 
   const analyzeRequest = async () => {
-    const cURL = window.STATE.curl;
+    const cURL = props.curl;
     console.log('CURL: ', cURL);
     if (!cURL.startsWith('curl')) {
       alert('NOT A VALID CURL');
@@ -132,8 +134,10 @@ export default function RequestAnalyzer(props) {
 
     let pipelines = [];
     try {
-      console.log(window.STATE.pipelines);
-      pipelines = window.STATE.pipelines;//JSON.parse(window.STATE.pipelines);
+      console.log('Current pipelines:');
+      pipelines=props.pipes;
+      console.log(pipelines);
+      //pipelines = window.STATE.pipelines;//JSON.parse(window.STATE.pipelines);
     }
     catch (e) {
       console.log(e);

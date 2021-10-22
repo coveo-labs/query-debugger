@@ -9,12 +9,13 @@ import RequestAnalyzer from './Components/RequestAnalyzer';
 
 // OK, this is cheating and bad, I know...
 // should use a proper React Context, just taking a shortcut for now
-window.STATE = { ...window.STATE, curl: '' };
+//window.STATE = { ...window.STATE, curl: '' };
 
 const App = () => {
   const [pipelineData, setPipelineData] = useState([]);
   const [elements, setElements] = useState(initialElements);
   const [queryPipeline, setQueryPipeline] = useState('');
+  const [curl, setCurl] = useState('');
   const [report, setReport] = useState('');
   const [selectedPipelineData, setSelectedPipelineData] = useState([]);
   const [featureData, setFeatureData] = useState([]);
@@ -51,6 +52,10 @@ const App = () => {
       data.name === event.target.value).statements);
   };
 
+  const loadPipelines = () => {
+    return pipelineData;
+  };
+
   const onElementClick = (event, element) => {
     const featureData = selectedPipelineData.filter((data) => element.data.value &&
       data.feature === element.data.value);
@@ -61,8 +66,8 @@ const App = () => {
       <h1 style={{ textAlign: 'center' }}>Query Debugger</h1>
       <h3 style={{ textAlign: 'center' }}>{String(report)}</h3>
       <div style={{ marginLeft: '1%' }}>
-        <RequestLoader setPipelines={setPipelineData} />
-        <RequestAnalyzer setPipelines={setPipelineData} />
+        <RequestLoader setPipelines={setPipelineData} setCurls={setCurl} />
+        <RequestAnalyzer setPipelines={setPipelineData} curl={curl} pipes={pipelineData} />
       </div>
       <Grid container>
         <Grid item xs={12} md={12} lg={12} style={{ textAlign: 'end', marginRight: '2%' }}>
