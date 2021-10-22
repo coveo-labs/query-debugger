@@ -17,7 +17,7 @@ const Details = (props) => {
     if (fData.definition) {
       return fData.definition;
     }
-    return fData.label;
+    return fData.label || fData;
   };
 
   return (

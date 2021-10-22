@@ -15,6 +15,7 @@ const App = () => {
   const [report, setReport] = useState('');
   const [selectedPipelineData, setSelectedPipelineData] = useState([]);
   const [featureData, setFeatureData] = useState([]);
+
   useEffect(() => {
     const updateElement = initialElements;
     setReport('No of pipelines retrieved: ', pipelineData?.length, pipelineData);
@@ -45,12 +46,12 @@ const App = () => {
   const onPipelineSelect = (event) => {
     setQueryPipeline(event.target.value);
     setSelectedPipelineData(pipelineData.find(data => data.name === event.target.value).statements);
+    setFeatureData([]);
   };
 
   const onElementClick = (event, element) => {
-    const featureData = selectedPipelineData.filter((data) => element.data.value &&
-      data.feature === element.data.value);
-    setFeatureData([...featureData]);
+    const data = selectedPipelineData.filter((data) => element.data.value && data.feature === element.data.value);
+    setFeatureData([...data]);
   };
 
   const onUpdatePipelines = (pipelines) => {

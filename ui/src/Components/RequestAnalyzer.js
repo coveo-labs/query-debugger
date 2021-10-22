@@ -222,7 +222,7 @@ export default class RequestAnalyzer extends React.Component {
     let pipelineReportDetails = null;
     //continue with the pipeline analysis
     if (pipelinesState.length > 0) {
-      console.log("Render default pipelines");
+      console.log("Continue with the pipeline analysis");
       pipelinesState.forEach((row, idx) => {
         if (pipelinesState[idx]['used'] === true) {
           console.log(JSON.stringify(pipelinesState[idx].statements));
