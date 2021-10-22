@@ -46,7 +46,7 @@ const App = () => {
   const onPipelineSelect = (event) => {
     setQueryPipeline(event.target.value);
     setSelectedPipelineData(pipelineData.find(data => data.name === event.target.value).statements);
-    setFeatureData([]);
+    setFeatureData([]); // reset Details view when changing the selected pipeline
   };
 
   const onElementClick = (event, element) => {
@@ -58,6 +58,7 @@ const App = () => {
     setQueryPipeline('');
     setSelectedPipelineData([]);
     setPipelineData(pipelines);
+    setFeatureData([]);
   };
 
   return (
