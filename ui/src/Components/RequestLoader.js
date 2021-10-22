@@ -11,11 +11,10 @@ import curlHelper from '../utils/curlHelper';
 import Pipelines from '../utils/Pipelines.js';
 
 export default function RequestLoader(props) {
-  let currentPipelines = [];
-
   const [open, setOpen] = React.useState(false);
   const [error, setError] = React.useState('');
   const [cURL, setcURL] = React.useState('');
+  const [pipelines, setPipelines] = React.useState([]);
   const [busy, setBusy] = React.useState(false);
 
   const handleClickOpen = () => { setOpen(true); };
@@ -40,8 +39,6 @@ export default function RequestLoader(props) {
     const bearer = request.headers?.authorization || '';
     let apiKeyOrToken = bearer.replace(/^Bearer\s+/gi, '').trim();
 
-    console.log(request.queries?.organizationId);
-    console.log(apiKeyOrToken);
     return new PlatformClient({
       accessToken: apiKeyOrToken || 'Missing-Token',
       organizationId: request.queries?.organizationId,
@@ -51,10 +48,8 @@ export default function RequestLoader(props) {
   };
 
   const handleSave = () => {
-    window.STATE.curl = cURL;
-    //console.log(window.STATE.pipelines);
-    //props.setPipelines(JSON.parse(window.STATE.pipelines));
-    props.setPipelines(currentPipelines);
+    props.setCurl(cURL);
+    props.setPipelines(pipelines);
     setOpen(false);
   };
 
@@ -81,7 +76,7 @@ export default function RequestLoader(props) {
       // const res = Buffer.from(curlSamples[name + '__response'], 'base64').toString();
       const pipelines = Buffer.from(curlSamples[name + '__pipelines'], 'base64').toString();
 
-      currentPipelines = JSON.parse(pipelines);
+      setPipelines(JSON.parse(pipelines));
       setcURL(req);
     } else {
       //Load it using the apikey and org from curl request
@@ -91,17 +86,14 @@ export default function RequestLoader(props) {
         let req = curlHelper.parseCurl(cURL);
         const platformClient = createPlatformClient(req);
 
-        const pipelines = new Pipelines(platformClient);
         console.log('Getting QPLs');
+        const pipelines = new Pipelines(platformClient);
         pipelines.getQPL().then(content => {
-          console.log(content);
+          // console.log(content);
+          setBusy(false);
           if (!content.length) {
-            setBusy(false);
             setError('Something went wrong, no content could be retrieved. Check the console for error message.');
           } else {
-            window.STATE.pipelines = content;
-            //setcURL(req);
-            setBusy(false);
             handleSave();
           }
         });
@@ -109,7 +101,7 @@ export default function RequestLoader(props) {
       catch (e) {
         setBusy(false);
         setError('Something went wrong, no content could be retrieved. Check the console for error message.');
-
+        console.warn(e);
       }
     }
   };

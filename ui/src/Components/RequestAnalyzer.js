@@ -28,28 +28,20 @@ export default class RequestAnalyzer extends React.Component {
       executionReport: {},
       pipelines: [],
       request: {},
+      response: {},
     });
   }
 
-  componentDidMount() {
-    console.log('RA:M - ');
-  }
-
   componentDidUpdate(prevProps, prevState, snapshot) {
-    console.log('RA:U - props', prevProps, this.props);
-    console.log('RA:U - state', prevState, this.state);
-
     if (this.state.dialogOpen && !prevState.dialogOpen) {
       // clear out previous state on OPEN: 
       // TODO: should only do it, when CURL is changing though
-      console.log(' ***** OPEN **** ');
       this.reset();
     }
   }
 
   handleClickOpen() { this.setState({ dialogOpen: true }); };
   handleClose() { this.setState({ dialogOpen: false }); };
-
 
   render() {
     // const [open, setOpen] = React.useState(false);
@@ -59,8 +51,6 @@ export default class RequestAnalyzer extends React.Component {
     const checkQueryField = (condition) => {
       let fieldFound = false;
       let result = false;
-
-      console.log('Check: ', this.state.request);
 
       Object.entries(this.state.request?.data || []).forEach(([key, value]) => {
         let fieldValue = `\\$${key}`;
@@ -121,8 +111,8 @@ export default class RequestAnalyzer extends React.Component {
     };
 
     const analyzeRequest = async () => {
-      const cURL = window.STATE.curl;
-      console.log('CURL: ', cURL);
+      const cURL = this.props.curl;
+
       if (!cURL.startsWith('curl')) {
         alert('NOT A VALID CURL');
         return;
@@ -132,10 +122,8 @@ export default class RequestAnalyzer extends React.Component {
       req = addRequestTranslators(req);
 
       const response = await curlHelper.sendRequest(req);
-      console.log(response);
 
       let pipelines = this.props.pipelineData;
-      console.log('1---- ', pipelines);
       this.setState({ request: req, response, pipelines });
     };
 
@@ -154,10 +142,9 @@ export default class RequestAnalyzer extends React.Component {
     }
 
     let pipelineReport = null;
-    //console.log(state.pipelines);
+
     let pipelineSelected = false;
     let pipelineName = '';
-    console.log('2---- ', this.state);
 
     const pipelinesState = this.state.pipelines;
     if (pipelinesState.length > 0) {
@@ -227,7 +214,7 @@ export default class RequestAnalyzer extends React.Component {
         });
       }
     }
-    console.log(pipelineReportDefault);
+    // console.log(pipelineReportDefault);
 
     //Add pipeline final analysis
     finalAnalysis['Pipeline Validation'] = this.state.request?.data?.pipeline === pipelineName;
@@ -238,7 +225,7 @@ export default class RequestAnalyzer extends React.Component {
       console.log("Render default pipelines");
       pipelinesState.forEach((row, idx) => {
         if (pipelinesState[idx]['used'] === true) {
-          console.log(pipelinesState[idx].statements);
+          console.log(JSON.stringify(pipelinesState[idx].statements));
           pipelineReportDetails = pipelinesState[idx].statements.map((statement, idxs) => {
             let valid = checkCondition(statement.condition);
             let conditionUsed = "No";
@@ -273,10 +260,8 @@ export default class RequestAnalyzer extends React.Component {
       });
 
       this.props.setPipelines(pipelinesState);
-      // window.STATE.pipelines = state.pipelines;
     }
     let executionReport = null;
-    //console.log(state.response, window.STATE.response);
     if (this.state.response?.executionReport) {
       const total = this.state.response.duration;
       executionReport = this.state.response?.executionReport.children.map((row, idx) => {
@@ -291,7 +276,7 @@ export default class RequestAnalyzer extends React.Component {
         </TableRow>;
       });
     }
-    console.log(executionReport);
+
     return (
       <>
         &nbsp; <Button variant="contained" onClick={() => this.handleClickOpen()}>
