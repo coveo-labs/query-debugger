@@ -62,7 +62,7 @@ const App = () => {
       <h3 style={{ textAlign: 'center' }}>{String(report)}</h3>
       <div style={{ marginLeft: '1%' }}>
         <RequestLoader setPipelines={setPipelineData} />
-        <RequestAnalyzer />
+        <RequestAnalyzer setPipelines={setPipelineData} />
       </div>
       <Grid container>
         <Grid item xs={12} md={12} lg={12} style={{ textAlign: 'end', marginRight: '2%' }}>
