@@ -221,7 +221,7 @@ export default class RequestAnalyzer extends React.Component {
       console.log("Continue with the pipeline analysis");
       pipelinesState.forEach((row, idx) => {
         if (pipelinesState[idx]['used'] === true) {
-          console.log(JSON.stringify(pipelinesState[idx].statements));
+          // console.log(JSON.stringify(pipelinesState[idx].statements));
           pipelineReportDetails = pipelinesState[idx].statements.map((statement, idxs) => {
             let valid = checkCondition(statement.condition);
             let conditionUsed = "No";
