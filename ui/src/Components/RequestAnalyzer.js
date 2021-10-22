@@ -44,10 +44,6 @@ export default class RequestAnalyzer extends React.Component {
   handleClose() { this.setState({ dialogOpen: false }); };
 
   render() {
-    // const [open, setOpen] = React.useState(false);
-    // const [state, setState] = React.useState({ request: {}, response: {}, pipelines: [] });
-
-
     const checkQueryField = (condition) => {
       let fieldFound = false;
       let result = false;
