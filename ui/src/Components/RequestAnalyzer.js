@@ -1,7 +1,8 @@
-import * as React from 'react';
+import React, { useEffect, useState } from 'react';
 import { AppBar, Button, Dialog, DialogContent, IconButton, TextField, Toolbar, Typography } from '@mui/material';
 import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, LinearProgress } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
+import ReactJson from "react-json-view";
 
 import curlHelper from '../utils/curlHelper';
 const REQUEST_TRANSLATORS = [
@@ -12,10 +13,15 @@ const REQUEST_TRANSLATORS = [
 ];
 export default function RequestAnalyzer(props) {
   const [open, setOpen] = React.useState(false);
+  const [json, setJSON] = React.useState({});
+  const [jsonT, setJSONT] = React.useState({});
   const [state, setState] = React.useState({ request: {}, response: {}, pipelines: [] });
 
   const handleClickOpen = () => { setOpen(true); };
   const handleClose = () => { setOpen(false); };
+  useEffect(() => {
+    setJSON(jsonT);
+  }, [jsonT]);
 
   const checkQueryField = (condition) => {
     let fieldFound = false;
@@ -29,10 +35,11 @@ export default function RequestAnalyzer(props) {
         //console.log("Condition contains field: " + fieldValue);
         try {
           let expression = condition.replaceAll(`$${key}`, value);
-          console.log(expression);
+          //console.log(expression);
           result = eval(expression);
         }
         catch (e) {
+          console.log(condition.replaceAll(`$${key}`, value));
           console.log(e);
           result = false;
         }
@@ -77,6 +84,37 @@ export default function RequestAnalyzer(props) {
     return req;
   };
 
+  const whatToDisplay = (field) => {
+    let returnValue = true;
+    //console.log(field);
+    if (field) {
+      if (field.name === false) returnValue = false;
+      let name = String(field.name);
+      try {
+        if (name.indexOf('Pipeline details') === -1 && field.namespace.length == 3 && String(field.namespace[1]) === 'Pipeline details') returnValue = false;
+      }
+      catch (e) {
+
+      }
+      if (name==='Query Pipeline') returnValue = false;
+      if (name.indexOf('Pipeline details') != -1) returnValue = false;
+      if (name.indexOf(' (selected)') != -1) returnValue = false;
+      if (name.indexOf(' (valid)') != -1) returnValue = false;
+      name = String(field.src.name);
+      if (name.indexOf(' (selected)') != -1) returnValue = false;
+      if (name.indexOf(' (valid)') != -1) returnValue = false;
+    }
+    //Check if field is an array
+    if (field['Query Pipelines'] !== undefined) {
+
+    }
+    return returnValue;
+  };
+
+  const handleCopy = (copy) => {
+    navigator.clipboard.writeText(JSON.stringify(copy.src, null, "\t"));
+  };
+
   const analyzeRequest = async () => {
     const cURL = window.STATE.curl;
     console.log('CURL: ', cURL);
@@ -116,59 +154,45 @@ export default function RequestAnalyzer(props) {
     });
   }
 
-  let pipelineReport = null;
-  //console.log(state.pipelines);
   let pipelineSelected = false;
   let pipelineName = '';
-  if (state.pipelines.length > 0) {
-    console.log("Render pipelines");
-    pipelineReport = state.pipelines.map((row, idx) => {
-      if (!row.isDefault) {
-        let valid = checkCondition(row.condition);
-        let conditionUsed = "No";
-        state.pipelines[idx]['used'] = false;
-        state.pipelines[idx]['valid'] = false;
-        if (valid === "Yes") {
-          if (pipelineSelected === false) {
-            pipelineSelected = true;
-            pipelineName = row.name;
-            conditionUsed = "Yes";
-            state.pipelines[idx]['used'] = true;
-          }
-          state.pipelines[idx]['valid'] = true;
-        }
-        return <TableRow key={row.id} class={'used' + state.pipelines[idx]['used'] + ' valid' + state.pipelines[idx]['valid']}>
-          <TableCell scope="row">
-            {idx + 1}
-          </TableCell>
-          <TableCell scope="row">
-            {row.name}
-          </TableCell>
-          <TableCell align="left">{row.condition ?.definition}</TableCell>
-          <TableCell align="left">{row.condition ?.clean_definition}</TableCell>
-          <TableCell align="right">{valid}</TableCell>
-          <TableCell align="right">{conditionUsed}</TableCell>
-        </TableRow>;
-      }
-      return null;
-    });
-  }
-  //If no pipeline selected: find the default one
-  let pipelineReportDefault = null;
+  let allJson = {};
+  let qplJson = [];
+  let qplSelJson = {};
 
-  if (!pipelineSelected) {
+  const getPipelineReport = () => {
+    let pipelineReport = null;
+
+    //console.log(state.pipelines);
     if (state.pipelines.length > 0) {
-      console.log("Render default pipelines");
-      pipelineReportDefault = state.pipelines.map((row, idx) => {
-        if (row.isDefault) {
+      console.log("Render pipelines");
+      pipelineReport = state.pipelines.map((row, idx) => {
+        if (!row.isDefault) {
           let valid = checkCondition(row.condition);
-          let conditionUsed = "Yes";
-          state.pipelines[idx]['used'] = true;
+          let jsonContent = {};
+          let addToGlobalJson=true;
+
+          jsonContent['definition'] = row.condition ?.definition;
+          let conditionUsed = "No";
+          state.pipelines[idx]['used'] = false;
           state.pipelines[idx]['valid'] = false;
-          pipelineName = row.name;
           if (valid === "Yes") {
+            if (pipelineSelected === false) {
+              pipelineSelected = true;
+              pipelineName = row.name;
+              jsonContent['name'] = row.name + ' (selected)';
+              conditionUsed = "Yes";
+              state.pipelines[idx]['used'] = true;
+              qplSelJson = jsonContent;
+              addToGlobalJson=false;
+            }
             state.pipelines[idx]['valid'] = true;
+            jsonContent['name'] = row.name + ' (valid)';
+
+          } else {
+            jsonContent['name'] = row.name;
           }
+          if (addToGlobalJson) qplJson.push(jsonContent);
           return <TableRow key={row.id} class={'used' + state.pipelines[idx]['used'] + ' valid' + state.pipelines[idx]['valid']}>
             <TableCell scope="row">
               {idx + 1}
@@ -185,73 +209,147 @@ export default function RequestAnalyzer(props) {
         return null;
       });
     }
+    return pipelineReport;
   }
-  console.log(pipelineReportDefault);
 
+  //If no pipeline selected: find the default one
+  const getPipelineReportDefault = () => {
+    let pipelineReportDefault = null;
+
+    if (!pipelineSelected) {
+      if (state.pipelines.length > 0) {
+        console.log("Render default pipelines");
+        pipelineReportDefault = state.pipelines.map((row, idx) => {
+          if (row.isDefault) {
+            let valid = checkCondition(row.condition);
+            let jsonContent = {};
+
+            jsonContent['definition'] = row.condition ?.definition;
+            let conditionUsed = "Yes";
+            state.pipelines[idx]['used'] = true;
+            state.pipelines[idx]['valid'] = false;
+            pipelineName = row.name;
+            jsonContent['name'] = row.name + ' (selected)';
+            qplSelJson = jsonContent;
+            if (valid === "Yes") {
+              state.pipelines[idx]['valid'] = true;
+            }
+            return <TableRow key={row.id} class={'used' + state.pipelines[idx]['used'] + ' valid' + state.pipelines[idx]['valid']}>
+              <TableCell scope="row">
+                {idx + 1}
+              </TableCell>
+              <TableCell scope="row">
+                {row.name}
+              </TableCell>
+              <TableCell align="left">{row.condition ?.definition}</TableCell>
+              <TableCell align="left">{row.condition ?.clean_definition}</TableCell>
+              <TableCell align="right">{valid}</TableCell>
+              <TableCell align="right">{conditionUsed}</TableCell>
+            </TableRow>;
+          }
+          return null;
+        });
+      }
+    }
+    // add to json
+    allJson['Query Pipeline'] = qplSelJson;
+    return pipelineReportDefault;
+  }
+  let featureJson = {};
   //Add pipeline final analysis
   //finalAnalysis['Pipeline Validation']=state.request?.data['pipeline']==pipelineName;
 
+  const getPipelineReportDetails = () => {
+    let pipelineReportDetails = null;
 
-  let pipelineReportDetails = null;
-  //continue with the pipeline analysis
-  if (state.pipelines.length > 0) {
-    console.log("Render default pipelines");
-    state.pipelines.forEach((row, idx) => {
-      if (state.pipelines[idx]['used'] === true) {
-        console.log(state.pipelines[idx].statements);
-        pipelineReportDetails = state.pipelines[idx].statements.map((statement, idxs) => {
-          let valid = checkCondition(statement.condition);
-          let conditionUsed = "No";
-          state.pipelines[idx].statements[idxs]['valid'] = false;
-          state.pipelines[idx].statements[idxs]['used'] = false;
-          state.pipelines[idx].statements[idxs]['inExecutionReport'] = checkInExecReport(statement.condition);
-          if (valid === "Yes") {
-            state.pipelines[idx].statements[idxs]['valid'] = true;
-            state.pipelines[idx].statements[idxs]['used'] = true;
-            conditionUsed = "Yes";
-          }
-          //If no condition, always used
-          if (!statement.condition) {
-            valid = "Yes";
-            state.pipelines[idx].statements[idxs]['used'] = true;
-            conditionUsed = "Yes";
-          }
-          return <TableRow key={statement.id} class={'valid' + state.pipelines[idx].statements[idxs]['valid'] + ' used' + state.pipelines[idx].statements[idxs]['used']}>
-            <TableCell scope="row">
-              {idxs + 1}
-            </TableCell>
-            <TableCell scope="row">
-              {statement.feature} - {statement.definition}
-            </TableCell>
-            <TableCell align="left">{statement.condition ?.definition}</TableCell>
-            <TableCell align="left">{statement.condition ?.clean_definition}</TableCell>
-            <TableCell align="right">{valid}</TableCell>
-            <TableCell align="right">{conditionUsed}</TableCell>
-          </TableRow>;
-        });
-      }
-    });
+    //continue with the pipeline analysis
+    if (state.pipelines.length > 0) {
+      console.log("Render default pipelines");
+      state.pipelines.forEach((row, idx) => {
+        if (state.pipelines[idx]['used'] === true) {
+          console.log(state.pipelines[idx].statements);
+          pipelineReportDetails = state.pipelines[idx].statements.map((statement, idxs) => {
+            let curJson = {};
+            let valid = checkCondition(statement.condition);
+            curJson['condition'] = statement.condition ?.definition;
+            curJson['name'] = statement.definition;
+            let conditionUsed = "No";
+            state.pipelines[idx].statements[idxs]['valid'] = false;
+            state.pipelines[idx].statements[idxs]['used'] = false;
+            state.pipelines[idx].statements[idxs]['inExecutionReport'] = checkInExecReport(statement.condition);
+            if (valid === "Yes") {
+              curJson['name'] += ' (valid)';
+              state.pipelines[idx].statements[idxs]['valid'] = true;
+              state.pipelines[idx].statements[idxs]['used'] = true;
+              conditionUsed = "Yes";
+            }
+            //If no condition, always used
+            if (!statement.condition) {
+              valid = "Yes";
+              curJson['name'] += ' (valid)';
+              state.pipelines[idx].statements[idxs]['used'] = true;
+              conditionUsed = "Yes";
+            }
+            if (featureJson[statement.feature] == undefined) {
+              featureJson[statement.feature] = [];
+            }
+            featureJson[statement.feature].push(curJson);
+            return <TableRow key={statement.id} class={'valid' + state.pipelines[idx].statements[idxs]['valid'] + ' used' + state.pipelines[idx].statements[idxs]['used']}>
+              <TableCell scope="row">
+                {idxs + 1}
+              </TableCell>
+              <TableCell scope="row">
+                {statement.feature} - {statement.definition}
+              </TableCell>
+              <TableCell align="left">{statement.condition ?.definition}</TableCell>
+              <TableCell align="left">{statement.condition ?.clean_definition}</TableCell>
+              <TableCell align="right">{valid}</TableCell>
+              <TableCell align="right">{conditionUsed}</TableCell>
+            </TableRow>;
+          });
+        }
+      });
+    }
+    if (state.pipelines.length > 0) {
+      console.log('Setting new pipelines');
+      allJson['Pipeline details'] = featureJson;
+      allJson['Query Pipelines Others'] = qplJson;
 
-    props.setPipelines(state.pipelines);
-    window.STATE.pipelines = state.pipelines;
+      props.setPipelines(state.pipelines);
+      window.STATE.pipelines = state.pipelines;
+      //setJSONT(allJson);
+    }
+    return pipelineReportDetails;
   }
-  let executionReport = null;
-  //console.log(state.response, window.STATE.response);
-  if (state.response ?.executionReport) {
-    const total = state.response.duration;
-    executionReport = state.response ?.executionReport.children.map((row, idx) => {
-      return <TableRow key={row.name}>
-        <TableCell scope="row">
-          {idx}
-        </TableCell>
-        <TableCell scope="row">
-          {row.name}
-        </TableCell>
-        <TableCell align="right">{row.duration} <LinearProgress variant="determinate" value={row.duration * 100 / total} /></TableCell>
-      </TableRow>;
-    });
+
+  const getJSONData = () => {
+    return allJson;
   }
-  console.log(executionReport);
+  const getExecutionReport = () => {
+    let executionReport = null;
+    //console.log(state.response, window.STATE.response);
+    if (state.response ?.executionReport) {
+      const total = state.response.duration;
+      executionReport = state.response ?.executionReport.children.map((row, idx) => {
+        return <TableRow key={row.name}>
+          <TableCell scope="row">
+            {idx}
+          </TableCell>
+          <TableCell scope="row">
+            {row.name}
+          </TableCell>
+          <TableCell align="right">{row.duration} <LinearProgress variant="determinate" value={row.duration * 100 / total} /></TableCell>
+        </TableRow>;
+      });
+    }
+    console.log(executionReport);
+    return executionReport;
+  }
+
+  const jsonStyle = {
+    backgroundColor: "#000"
+  };
+
   return (
     <>
       &nbsp; <Button variant="contained" onClick={handleClickOpen}>
@@ -274,8 +372,23 @@ export default function RequestAnalyzer(props) {
           <div>
             {parameters}
           </div>
+          <ReactJson
+            name={false}
+            src={getJSONData()}
+            style={jsonStyle}
+            theme="monokai"
+            iconStyle="square"
+            enableClipboard={false}
+            onEdit={false}
+            onDelete={false}
+            onAdd={false}
+            displayDataTypes={false}
+            shouldCollapse={whatToDisplay}
+            groupArraysAfterLength={1000}
+            collapseStringsAfterLength={250}
+          />
           <h3>Pipeline Report</h3>
-          {pipelineReport && <TableContainer component={Paper}>
+          <TableContainer component={Paper}>
             <Table sx={{ minWidth: 650, maxWidth: 850, wordBreak: 'break-word', overflowWrap: 'break-word' }} size="small" aria-label="a dense table">
               <TableHead>
                 <TableRow>
@@ -288,13 +401,13 @@ export default function RequestAnalyzer(props) {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {pipelineReport}
-                {pipelineReportDefault}
+                {getPipelineReport()}
+                {getPipelineReportDefault()}
               </TableBody>
             </Table>
-          </TableContainer>}
+          </TableContainer>
           <h3>Selected Pipeline Report</h3>
-          {pipelineReportDetails && <TableContainer component={Paper}>
+          <TableContainer component={Paper}>
             <Table sx={{ minWidth: 650, maxWidth: 850, wordBreak: 'break-word', overflowWrap: 'break-word' }} size="small" aria-label="a dense table">
               <TableHead>
                 <TableRow>
@@ -307,12 +420,12 @@ export default function RequestAnalyzer(props) {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {pipelineReportDetails}
+                {getPipelineReportDetails()}
               </TableBody>
             </Table>
-          </TableContainer>}
+          </TableContainer>
           <h3>Execution Report</h3>
-          {executionReport && <TableContainer component={Paper}>
+          <TableContainer component={Paper}>
             <Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
               <TableHead>
                 <TableRow>
@@ -322,10 +435,10 @@ export default function RequestAnalyzer(props) {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {executionReport}
+                {getExecutionReport()}
               </TableBody>
             </Table>
-          </TableContainer>}
+          </TableContainer>
           <h3>Scores</h3>
           <i>soon...</i>
         </DialogContent>
