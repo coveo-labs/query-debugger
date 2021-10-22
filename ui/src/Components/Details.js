@@ -37,7 +37,7 @@ const Details = (props) => {
           </AccordionSummary>
           {props.featureData.map((fData, index) =>
             <>
-              <AccordionDetails>
+              <AccordionDetails className={'used' + fData.used}>
                 <Typography noWrap>{index + 1}) Definition: {fData.definition || 'N/A'}</Typography>
                 <Typography noWrap style={{ marginLeft: '1.5%' }} sx={{ color: 'text.secondary' }}>
                   Condition: {fData.condition ? fData.condition.definition : 'None'}
