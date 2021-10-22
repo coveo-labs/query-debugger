@@ -20,7 +20,7 @@ export default function RequestAnalyzer() {
   const checkQueryField = (condition) => {
     let fieldFound = false;
     let result = false;
-    Object.entries(state.request?.data).forEach(([key, value]) => {
+    Object.entries(state.request ?.data).forEach(([key, value]) => {
       let fieldValue = `\\$${key}`;
       const regex = new RegExp(fieldValue);
       //Check if fieldValue is within condition
@@ -94,7 +94,7 @@ export default function RequestAnalyzer() {
     let pipelines = [];
     try {
       console.log(window.STATE.pipelines);
-      pipelines = JSON.parse(window.STATE.pipelines);
+      pipelines = window.STATE.pipelines;//JSON.parse(window.STATE.pipelines);
     }
     catch (e) {
       console.log(e);
@@ -104,12 +104,13 @@ export default function RequestAnalyzer() {
 
   let parameters = null;
   let finalAnalysis = {};
-  if (state.request?.data) {
-    parameters = Object.entries(state.request?.data).map(([key, value]) => {
+  if (state.request ?.data) {
+    parameters = Object.entries(state.request ?.data).map(([key, value]) => {
       return <TextField
         id={'tf--' + key}
         key={'tf--' + key}
         label={key}
+        value={value}
         defaultValue={value}
       />;
     });
@@ -143,8 +144,8 @@ export default function RequestAnalyzer() {
           <TableCell scope="row">
             {row.name}
           </TableCell>
-          <TableCell align="left">{row.condition?.definition}</TableCell>
-          <TableCell align="left">{row.condition?.clean_definition}</TableCell>
+          <TableCell align="left">{row.condition ?.definition}</TableCell>
+          <TableCell align="left">{row.condition ?.clean_definition}</TableCell>
           <TableCell align="right">{valid}</TableCell>
           <TableCell align="right">{conditionUsed}</TableCell>
         </TableRow>;
@@ -175,8 +176,8 @@ export default function RequestAnalyzer() {
             <TableCell scope="row">
               {row.name}
             </TableCell>
-            <TableCell align="left">{row.condition?.definition}</TableCell>
-            <TableCell align="left">{row.condition?.clean_definition}</TableCell>
+            <TableCell align="left">{row.condition ?.definition}</TableCell>
+            <TableCell align="left">{row.condition ?.clean_definition}</TableCell>
             <TableCell align="right">{valid}</TableCell>
             <TableCell align="right">{conditionUsed}</TableCell>
           </TableRow>;
@@ -222,22 +223,23 @@ export default function RequestAnalyzer() {
             <TableCell scope="row">
               {statement.feature} - {statement.definition}
             </TableCell>
-            <TableCell align="left">{statement.condition?.definition}</TableCell>
-            <TableCell align="left">{statement.condition?.clean_definition}</TableCell>
+            <TableCell align="left">{statement.condition ?.definition}</TableCell>
+            <TableCell align="left">{statement.condition ?.clean_definition}</TableCell>
             <TableCell align="right">{valid}</TableCell>
             <TableCell align="right">{conditionUsed}</TableCell>
           </TableRow>;
         });
       }
     });
-
-    window.STATE.pipelines = state.pipelines;
+    if (state.pipelines.length > 0) {
+      window.STATE.pipelines = state.pipelines;
+    }
   }
   let executionReport = null;
   //console.log(state.response, window.STATE.response);
-  if (state.response?.executionReport) {
+  if (state.response ?.executionReport) {
     const total = state.response.duration;
-    executionReport = state.response?.executionReport.children.map((row, idx) => {
+    executionReport = state.response ?.executionReport.children.map((row, idx) => {
       return <TableRow key={row.name}>
         <TableCell scope="row">
           {idx}
@@ -267,7 +269,7 @@ export default function RequestAnalyzer() {
         <DialogContent>
           <Button variant="contained" onClick={analyzeRequest}>Analyze</Button>
           <h3>
-            Parameters:{state.request?.data && <span>{state.request?.data.length}</span>}
+            Parameters:{state.request ?.data && <span>{state.request ?.data.length}</span>}
           </h3>
           <div>
             {parameters}

@@ -26,14 +26,20 @@ const curlHelper = {
     const params = new URLSearchParams();
     delete r.data.language;
     Object.keys(r.data).map(key => {
-      params.append(key,r.data[key]);
+      params.append(key, r.data[key]);
     });
 
-    r.body = params;
+    //If content-type = json, use a different approach
+    if (r.headers['content-type'].includes('json')) {
+      r.body = JSON.stringify(r.data);
+    } else {
+      r.body = params;
+    }
     const url = r.raw_url;
     r.headers = {
       authorization: r.headers.authorization,
       'content-type': r.headers['content-type'],
+      //'content-type': 'application/x-www-form-urlencoded; charset=UTF-8'
     };
     r.method = 'POST';
 

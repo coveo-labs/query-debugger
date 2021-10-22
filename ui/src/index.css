@@ -16,3 +16,7 @@ code {
 .usedfalse {
   background-color: lightgrey;
 }
+
+h3 {
+  margin: 5px;
+}

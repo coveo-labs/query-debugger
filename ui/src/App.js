@@ -15,10 +15,13 @@ const App = () => {
   const [pipelineData, setPipelineData] = useState([]);
   const [elements, setElements] = useState(initialElements);
   const [queryPipeline, setQueryPipeline] = useState('');
+  const [report, setReport] = useState('');
   const [selectedPipelineData, setSelectedPipelineData] = useState([]);
   const [featureData, setFeatureData] = useState([]);
   useEffect(() => {
     const updateElement = initialElements;
+    setReport('No of pipelines retrieved: '+pipelineData.length);
+
     updateElement.map((el) => {
       if (el.id === 'start') {
         el = { ...el };
@@ -40,7 +43,7 @@ const App = () => {
       return el;
     });
     setElements([...updateElement]);
-  }, [selectedPipelineData, queryPipeline]);
+  }, [selectedPipelineData, queryPipeline, pipelineData]);
 
   const onPipelineSelect = (event) => {
     setQueryPipeline(event.target.value);
@@ -56,6 +59,7 @@ const App = () => {
   return (
     <>
       <h1 style={{ textAlign: 'center' }}>Query Debugger</h1>
+      <h3 style={{ textAlign: 'center' }}>{String(report)}</h3>
       <div style={{ marginLeft: '1%' }}>
         <RequestLoader setPipelines={setPipelineData} />
         <RequestAnalyzer />
