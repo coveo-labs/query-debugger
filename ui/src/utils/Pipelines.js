@@ -82,6 +82,7 @@ class Pipelines {
     condition = condition + ' ';
     condition = condition.replaceAll('(', '( ');
     condition = condition.replaceAll(')', ' )');
+    console.log('Before clean: ' + condition);
     SCRIPT_TRANSLATORS.map(script => {
       condition = condition.replace(script.from, script.to);
     });

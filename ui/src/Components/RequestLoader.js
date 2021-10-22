@@ -61,7 +61,7 @@ export default function RequestLoader(props) {
     if (value) {
       return (
         <Box sx={{ width: '100%', padding: '10px' }}>
-          <b>Gathering Content from Coveo Platform, please wait</b>
+          <b>Collecting Content from Coveo Platform, please wait</b>
           <LinearProgress sx={{ marginTop: '10px', marginBottom: '10px', padding: '5px' }} />
         </Box>
       );
@@ -133,7 +133,6 @@ export default function RequestLoader(props) {
           <div>
             <h3>Samples:</h3>
             <ButtonGroup variant="outlined" aria-label="outlined primary button group">
-              <Button onClick={() => loadSample('dellsandbox')} primary  >Dell Sandbox</Button>
               <Button onClick={() => loadSample('fashion')}>Fashion</Button>
             </ButtonGroup>
             <h3>New request:</h3>

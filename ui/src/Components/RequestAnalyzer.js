@@ -54,6 +54,7 @@ export default function RequestAnalyzer(props) {
   const checkCondition = (condition) => {
     //Checks if condition is met by the query
     if (condition) {
+      //console.log(condition.definition);
       let conditionToCheck = condition.clean_definition;
       if (conditionToCheck !== "") {
         let result = checkQueryField(conditionToCheck);
