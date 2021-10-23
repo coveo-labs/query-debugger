@@ -7,20 +7,18 @@ import Details from './Components/Details';
 import RequestLoader from './Components/RequestLoader';
 import RequestAnalyzer from './Components/RequestAnalyzer';
 
-// OK, this is cheating and bad, I know...
-// should use a proper React Context, just taking a shortcut for now
-window.STATE = { ...window.STATE, curl: '' };
-
 const App = () => {
   const [pipelineData, setPipelineData] = useState([]);
   const [elements, setElements] = useState(initialElements);
   const [queryPipeline, setQueryPipeline] = useState('');
+  const [curl, setCurl] = useState('');
   const [report, setReport] = useState('');
   const [selectedPipelineData, setSelectedPipelineData] = useState([]);
   const [featureData, setFeatureData] = useState([]);
+
   useEffect(() => {
     const updateElement = initialElements;
-    setReport('No of pipelines retrieved: '+pipelineData.length);
+    setReport('No of pipelines retrieved: ', pipelineData?.length, pipelineData);
 
     updateElement.map((el) => {
       if (el.id === 'start') {
@@ -47,22 +45,29 @@ const App = () => {
 
   const onPipelineSelect = (event) => {
     setQueryPipeline(event.target.value);
-    setSelectedPipelineData(pipelineData.find(data =>
-      data.name === event.target.value).statements);
+    setSelectedPipelineData(pipelineData.find(data => data.name === event.target.value).statements);
+    setFeatureData([]); // reset Details view when changing the selected pipeline
   };
 
   const onElementClick = (event, element) => {
-    const featureData = selectedPipelineData.filter((data) => element.data.value &&
-      data.feature === element.data.value);
-    setFeatureData([...featureData]);
+    const data = selectedPipelineData.filter((data) => element.data.value && data.feature === element.data.value);
+    setFeatureData([...data]);
   };
+
+  const onUpdatePipelines = (pipelines) => {
+    setQueryPipeline('');
+    setSelectedPipelineData([]);
+    setPipelineData(pipelines);
+    setFeatureData([]);
+  };
+
   return (
     <>
       <h1 style={{ textAlign: 'center' }}>Query Debugger</h1>
       <h3 style={{ textAlign: 'center' }}>{String(report)}</h3>
       <div style={{ marginLeft: '1%' }}>
-        <RequestLoader setPipelines={setPipelineData} />
-        <RequestAnalyzer setPipelines={setPipelineData} />
+        <RequestLoader setPipelines={onUpdatePipelines} setCurl={setCurl} />
+        <RequestAnalyzer pipelineData={pipelineData} setPipelines={setPipelineData} curl={curl} />
       </div>
       <Grid container>
         <Grid item xs={12} md={12} lg={12} style={{ textAlign: 'end', marginRight: '2%' }}>
@@ -75,7 +80,7 @@ const App = () => {
               label="Select Query Pipeline"
               onChange={onPipelineSelect}
             >
-              {pipelineData && pipelineData.map((data) => <MenuItem value={data.name}>{data.name}</MenuItem>)}
+              {pipelineData?.map && pipelineData.map((data) => <MenuItem key={'menu--' + data.name} value={data.name}>{data.name}</MenuItem>)}
             </Select>
           </FormControl>
         </Grid>

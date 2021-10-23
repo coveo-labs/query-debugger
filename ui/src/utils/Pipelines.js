@@ -82,7 +82,7 @@ class Pipelines {
     condition = condition + ' ';
     condition = condition.replaceAll('(', '( ');
     condition = condition.replaceAll(')', ' )');
-    SCRIPT_TRANSLATORS.map(script => {
+    SCRIPT_TRANSLATORS.forEach(script => {
       condition = condition.replace(script.from, script.to);
     });
     console.log(condition);
@@ -92,14 +92,14 @@ class Pipelines {
   cleanCondition(condition) {
     let clean = {};
     if (!condition) { return null; }
-    Object.keys(condition).map(key => {
+    Object.keys(condition).forEach(key => {
       if (FIELDS_FROM_STATEMENTS.includes(key)) {
         clean[key] = condition[key];
       }
     });
     clean['definition'] = this.cleanDefinition(clean['definition']);
     //Check if it is a when operation (a condition)
-    if (clean['feature'] == 'when') {
+    if (clean['feature'] === 'when') {
       clean['clean_definition'] = this.cleanScript(clean['definition'].replace('when ', ''));
     }
     return clean;
@@ -107,7 +107,7 @@ class Pipelines {
 
   cleanFieldsPipeline(pipeline) {
     let clean = {};
-    Object.keys(pipeline).map(key => {
+    Object.keys(pipeline).forEach(key => {
       if (FIELDS_FROM_PIPELINE.includes(key)) {
         clean[key] = pipeline[key];
       }
@@ -119,10 +119,9 @@ class Pipelines {
   }
 
   cleanFieldsStatement(statements) {
-    let cleanStatements = [];
-    statements.map(statement => {
+    let cleanStatements = statements.map(statement => {
       let clean = {};
-      Object.keys(statement).map(key => {
+      Object.keys(statement).forEach(key => {
         if (FIELDS_FROM_STATEMENTS.includes(key)) {
           clean[key] = statement[key];
         }
@@ -131,7 +130,7 @@ class Pipelines {
       //Check if condition is defined, if so clean it
       clean['condition'] = this.cleanCondition(clean['condition']);
 
-      cleanStatements.push(clean);
+      return clean;
     });
     return cleanStatements;
   }

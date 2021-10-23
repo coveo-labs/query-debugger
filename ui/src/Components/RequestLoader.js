@@ -14,6 +14,7 @@ export default function RequestLoader(props) {
   const [open, setOpen] = React.useState(false);
   const [error, setError] = React.useState('');
   const [cURL, setcURL] = React.useState('');
+  const [pipelines, setPipelines] = React.useState([]);
   const [busy, setBusy] = React.useState(false);
 
   const handleClickOpen = () => { setOpen(true); };
@@ -26,7 +27,7 @@ export default function RequestLoader(props) {
     let environment = Environment.prod;
     let region = Region.US;
 
-    const endpoint = (request.headers ?.authority || '').toLowerCase();
+    const endpoint = (request.headers?.authority || '').toLowerCase();
 
     if (endpoint.startsWith('platformqa')) environment = Environment.staging;
     else if (endpoint.startsWith('platformdev')) environment = Environment.dev;
@@ -35,24 +36,20 @@ export default function RequestLoader(props) {
     if ((/^platform\w*-au/i).test(endpoint)) region = Region.AU;
     else if ((/^platform\w*-eu/i).test(endpoint)) region = Region.EU;
 
-    const bearer = request.headers ?.authorization || '';
+    const bearer = request.headers?.authorization || '';
     let apiKeyOrToken = bearer.replace(/^Bearer\s+/gi, '').trim();
 
-    console.log(request.queries ?.organizationId);
-    console.log(apiKeyOrToken);
     return new PlatformClient({
       accessToken: apiKeyOrToken || 'Missing-Token',
-      organizationId: request.queries ?.organizationId,
+      organizationId: request.queries?.organizationId,
       environment,
       region,
     });
   };
 
   const handleSave = () => {
-    window.STATE.curl = cURL;
-    //console.log(window.STATE.pipelines);
-    //props.setPipelines(JSON.parse(window.STATE.pipelines));
-    props.setPipelines(window.STATE.pipelines);
+    props.setCurl(cURL);
+    props.setPipelines(pipelines);
     setOpen(false);
   };
 
@@ -71,16 +68,15 @@ export default function RequestLoader(props) {
         {String(errorMessage)}
       </Typography>
     );
-  }
+  };
 
   const loadSample = (name) => {
     if (name !== 'CURL') {
       const req = Buffer.from(curlSamples[name + '__curl'], 'base64').toString();
-      const res = Buffer.from(curlSamples[name + '__response'], 'base64').toString();
+      // const res = Buffer.from(curlSamples[name + '__response'], 'base64').toString();
       const pipelines = Buffer.from(curlSamples[name + '__pipelines'], 'base64').toString();
-      //window.STATE.curl = req;
-      window.STATE.response = res;
-      window.STATE.pipelines = JSON.parse(pipelines);
+
+      setPipelines(JSON.parse(pipelines));
       setcURL(req);
     } else {
       //Load it using the apikey and org from curl request
@@ -90,17 +86,14 @@ export default function RequestLoader(props) {
         let req = curlHelper.parseCurl(cURL);
         const platformClient = createPlatformClient(req);
 
-        const pipelines = new Pipelines(platformClient);
         console.log('Getting QPLs');
+        const pipelines = new Pipelines(platformClient);
         pipelines.getQPL().then(content => {
-          console.log(content);
-          if (content.length == 0) {
-            setBusy(false);
+          // console.log(content);
+          setBusy(false);
+          if (!content.length) {
             setError('Something went wrong, no content could be retrieved. Check the console for error message.');
           } else {
-            window.STATE.pipelines = content;
-            //setcURL(req);
-            setBusy(false);
             handleSave();
           }
         });
@@ -108,7 +101,7 @@ export default function RequestLoader(props) {
       catch (e) {
         setBusy(false);
         setError('Something went wrong, no content could be retrieved. Check the console for error message.');
-
+        console.warn(e);
       }
     }
   };
@@ -133,7 +126,7 @@ export default function RequestLoader(props) {
           <div>
             <h3>Samples:</h3>
             <ButtonGroup variant="outlined" aria-label="outlined primary button group">
-              <Button onClick={() => loadSample('dellsandbox')} primary  >Dell Sandbox</Button>
+              <Button onClick={() => loadSample('dellsandbox')}>Dell Sandbox</Button>
               <Button onClick={() => loadSample('fashion')}>Fashion</Button>
             </ButtonGroup>
             <h3>New request:</h3>
